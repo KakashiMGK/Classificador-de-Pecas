@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classificador de Peças", "Classificador de Peças.csproj", "{7D0FE021-EAB0-4075-B761-395F618DC3EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D0FE021-EAB0-4075-B761-395F618DC3EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D0FE021-EAB0-4075-B761-395F618DC3EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D0FE021-EAB0-4075-B761-395F618DC3EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D0FE021-EAB0-4075-B761-395F618DC3EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A22B2C46-9216-4A2C-98BF-8F921A5E4856}
+	EndGlobalSection
+EndGlobal
