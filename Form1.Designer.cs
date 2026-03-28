@@ -99,6 +99,7 @@
             btnAbrirPerfil = new Button();
             lblAgMDF = new Label();
             lblAgPerfil = new Label();
+            btnAtualizacoes = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -599,7 +600,6 @@
             // 
             // chckBoxEnvioEmail
             // 
-            chckBoxEnvioEmail.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             chckBoxEnvioEmail.AutoSize = true;
             chckBoxEnvioEmail.Enabled = false;
             chckBoxEnvioEmail.Location = new Point(939, 88);
@@ -642,7 +642,6 @@
             // 
             // chckbxSobreescrever
             // 
-            chckbxSobreescrever.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             chckbxSobreescrever.AutoSize = true;
             chckbxSobreescrever.Checked = true;
             chckbxSobreescrever.CheckState = CheckState.Checked;
@@ -658,9 +657,9 @@
             // btnAdmin
             // 
             btnAdmin.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnAdmin.Location = new Point(822, 516);
+            btnAdmin.Location = new Point(830, 535);
             btnAdmin.Name = "btnAdmin";
-            btnAdmin.Size = new Size(101, 44);
+            btnAdmin.Size = new Size(103, 25);
             btnAdmin.TabIndex = 42;
             btnAdmin.Text = "Administrador";
             btnAdmin.UseVisualStyleBackColor = true;
@@ -695,12 +694,23 @@
             lblAgPerfil.TabIndex = 45;
             lblAgPerfil.Text = "Aguardando...";
             // 
+            // btnAtualizacoes
+            // 
+            btnAtualizacoes.Location = new Point(1098, 3);
+            btnAtualizacoes.Name = "btnAtualizacoes";
+            btnAtualizacoes.Size = new Size(86, 27);
+            btnAtualizacoes.TabIndex = 46;
+            btnAtualizacoes.Text = "Atualizações";
+            btnAtualizacoes.UseVisualStyleBackColor = true;
+            btnAtualizacoes.Click += btnAtualizacoes_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(1333, 598);
+            Controls.Add(btnAtualizacoes);
             Controls.Add(lblAgPerfil);
             Controls.Add(lblAgMDF);
             Controls.Add(btnAbrirPerfil);
@@ -738,7 +748,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1349, 637);
             Name = "Form1";
-            Text = "Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior ";
+            Text = "[2.1] Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior ";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
@@ -817,5 +827,6 @@
         private Button btnAbrirPerfil;
         private Label lblAgMDF;
         private Label lblAgPerfil;
+        private Button btnAtualizacoes;
     }
 }

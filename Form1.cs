@@ -45,8 +45,8 @@ namespace Classificador_de_Peças
         public string codigoUltimaLeitura = "";
         public int qntdpecasgrid;
 
-        //public string caminhoPadraoInfoPecas = @"J:\PCP\InfoPecasPlanos\";
-        public string caminhoPadraoInfoPecas = @"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\";
+        public string caminhoPadraoInfoPecas = @"J:\PCP\InfoPecasPlanos\";
+        //public string caminhoPadraoInfoPecas = @"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\";
 
         // Para fazer a contagem de peças de cada plano gerado em csv
         public int emailqntdPLPinFolha = 0;
@@ -142,7 +142,7 @@ namespace Classificador_de_Peças
             ofd.RestoreDirectory = false;
 
             this.Text = $"{CultureInfo.CurrentCulture.Name} | " +
-            "Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior - Arquivo: " + ofd.FileName;
+            "[2.1] Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior - Arquivo: " + ofd.FileName;
             if (buscaArquivo == DialogResult.OK)
             {
 
@@ -240,7 +240,7 @@ namespace Classificador_de_Peças
             stopwatch.Start();
             var lotecru = File.ReadAllLines(caminhocolado2).Skip(1);
 
-            
+
 
 
             // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
@@ -1126,7 +1126,7 @@ namespace Classificador_de_Peças
                 // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
                 PainelSecundario.AppendText("\n\nLendo o CSV");
                 PainelSecundario.ScrollToCaret();
-
+                var listaPerfils = File.ReadLines(caminhocsvPerfil).Skip(1); // Leitura do CSV de Perfil
 
                 // AS LISTAS PARA A EXPLOSAO DO CSV PARA OTIMIZACAO
                 var plpinfolhaList = new List<Armazenado> { }; // PLANO A
@@ -1153,6 +1153,7 @@ namespace Classificador_de_Peças
 
                 // AS LISTAS PARA EXPLOSÃO DO CSV PARA RELATORIO DO LOTE
                 var MPList = new List<Armazenado> { }; // RELATORIO MONTAGEM DE PERFIL   - POSTO OPERATIVO QUE CONTEM MP
+                var PortasColagemList = new List<Armazenado> { }; // RELATORIO PORTAS COLAGEM
                 var MEList = new List<Armazenado> { }; // RELATORIO MONTAGEM DE ELETRICA - POSTO OPERATIVO QUE CONTEM ME
                 var MOList = new List<Armazenado> { }; // RELATORIO MONTAGEM DE CAIXARIA - PLANO QUE CONTEM PL_MO, PL_PORTAFRENTE_MO OU PL_PINFOLHAMO
                 var MAList = new List<Armazenado> { }; // RELATORIO MARCENARIA           - POSTO OPERATIVO QUE CONTEM MA
@@ -1168,7 +1169,7 @@ namespace Classificador_de_Peças
 
                 var listaAmbientesFolha = new List<string> { };
                 var listaPinturaFolha = new List<string> { };
-
+                var listaAlt12To18 = new List<Armazenado>();
 
 
 
@@ -1297,7 +1298,30 @@ namespace Classificador_de_Peças
 
                     decimal altura = decimal.Parse(armazenar.Altura, CultureInfo.InvariantCulture);
                     decimal largura = decimal.Parse(armazenar.Largura, CultureInfo.InvariantCulture);
-
+                    // verifica se tem porta mpr de 12mm
+                    if (armazenar.CodigoMaterial.Contains("12161") && armazenar.DescricaoPeca.Length >= 3 && armazenar.DescricaoPeca.Substring(0, 3) == "MPR" && armazenar.CodigoPeca.Contains("POPA")) // Caso seja uma materia prima de 12mm
+                    {
+                        PainelSecundario.AppendText("\n\nPeça com matéria prima de 12mm SnowMatt encontrada. Peça: " + armazenar.CodigoPeca + " - " + armazenar.DescricaoPeca);
+                        PainelSecundario.ScrollToCaret();
+                        armazenar.Espessura = "18";          // Já faz a alteração desta peça que está rodando neste for each
+                        armazenar.CodigoMaterial = "18" + armazenar.CodigoMaterial.Substring(2); // Já faz a alteração desta peça que está rodando neste for each
+                        armazenar.DescricaoMaterial = armazenar.DescricaoMaterial.Replace("12MM", "18MM");
+                        armazenar.DescricaoPeca = armazenar.DescricaoPeca.Replace("X12X12X", "X18X18X");
+                        armazenar.DesenhoUm = "Removido Usi"; // remove a usinagem por via das duvidas
+                        armazenar.DescricaoMaterial = armazenar.DescricaoMaterial + "ALT 12MM PARA 18MM"; // adiciona na descrição do material a alteração feita para controle
+                        foreach (var item in listaCalculoM2) // percorre pela lista calculada m2
+                        {
+                            Armazenado arm2 = item;
+                            if (arm2.Modulo == armazenar.Modulo && armazenar.DescricaoPeca.Length >= 3 && arm2.DescricaoPeca.Substring(0, 3) == "MPR" && arm2.CodigoPeca.Contains("POPA"))
+                            {
+                                // caso localize adicione na lista para quando o foreach passar novamente ele fazer a troca de espessura no codigo seguinte
+                                if (!listaAlt12To18.Any(p => p.NumeroOrdem == arm2.NumeroOrdem))
+                                    listaAlt12To18.Add(arm2);
+                                PainelSecundario.AppendText($"\n\nPeça parceira encontrada para alteração de 12mm para 18mm. Peça: {arm2.CodigoPeca} - {arm2.DescricaoPeca}");
+                                PainelSecundario.ScrollToCaret();
+                            }
+                        }
+                    }
 
                     // SE HOUVER SILK NAVAL DE 25MM ALTERAR PARA BRANCO TX NAVAL 
                     if (armazenar.PostosOperativos.Contains("PIN"))
@@ -1497,6 +1521,7 @@ namespace Classificador_de_Peças
                 PainelSecundario.AppendText("\n\nAnalise de quantidades e alterações feitas.");
                 PainelSecundario.ScrollToCaret();
 
+                
 
                 foreach (var linha in listaCalculoM2)
                 {
@@ -1635,6 +1660,21 @@ namespace Classificador_de_Peças
                     // FRENTE DISPENSER SEM MP
                     if (armazenar.DescricaoPeca.Contains("DISPENSER") && !armazenar.PostosOperativos.Contains("MP"))
                         armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // FILTRA A MATERIA PRIMA QUE SEJA '12161' SNOW MAT QUE NAO EXISTE, LOCALIZAR A OUTRA MATERIA PRIMA E ALTERAR AS DUAS PARA 18MM
+                    
+                    // Encontra a peça parceira que terá que fazer a troca de 12 para 18mm
+                    bool trocar12To18 = listaAlt12To18.Any(p => p.NumeroOrdem == armazenar.NumeroOrdem);
+                    if (trocar12To18 == true)
+                    {
+                        armazenar.Espessura = "18";          // Já faz a alteração desta peça que está rodando neste for each
+                        armazenar.CodigoMaterial = "18" + armazenar.CodigoMaterial.Substring(2); // Já faz a alteração desta peça que está rodando neste for each
+                        armazenar.DescricaoMaterial = armazenar.DescricaoMaterial.Replace("12MM", "18MM");
+                        armazenar.DescricaoPeca = armazenar.DescricaoPeca.Replace("X12X12X", "X18X18X");
+                        armazenar.DescricaoMaterial = armazenar.DescricaoMaterial + " - ALT 12MM PARA 18MM";
+                        armazenar.DesenhoUm = "Removido Usi"; // remove a usinagem por via das duvidas
+                        PainelSecundario.AppendText($"\n\nPeça alterada de 12mm para 18mm. Peça: {armazenar.CodigoPeca} - {armazenar.DescricaoPeca}");
+                        PainelSecundario.ScrollToCaret();
+                    }
 
                     if (armazenar.CodigoPeca.Contains(".") == true && !armazenar.NumeroLote.Contains("_") && System.IO.Path.GetFileName(caminhocolado2).Contains("ASM", StringComparison.OrdinalIgnoreCase) == false)
                     {
@@ -1758,10 +1798,15 @@ namespace Classificador_de_Peças
                     }
                     // INICIO SEPARAÇÃO DO RELATORIO DE LOTES 
                     // INSERÇÃO DA LISTA DE COLAGEM
-                    if (armazenar.CodigoPeca.Contains("BORD") || armazenar.Espessura == "37" || armazenar.Espessura == "51" || armazenar.DescricaoPeca.Substring(0, 3).Contains("MPR"))
+                    if ((armazenar.CodigoPeca.Contains("BORD") || armazenar.Espessura == "37" || armazenar.Espessura == "51" || armazenar.DescricaoPeca.Substring(0, 3).Contains("MPR")) && !armazenar.CodigoPeca.Contains("POSY0010"))
                     {
                         COLAGEMList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-
+                        foreach(var i in listaPerfils)
+                        {
+                            Armazenado perfil = i;
+                            if (perfil.Modulo == armazenar.Modulo && (perfil.DescricaoPeca.Contains("TRILHO GUIA") || perfil.DescricaoPeca.Contains("FREE")))
+                                COLAGEMList.Add(perfil);
+                        }
                     }
 
                     if (armazenar.PostosOperativos.Contains("TP") || armazenar.DescricaoPeca.Contains("PREENCH") && armazenar.DescricaoPeca.Contains("ALUM"))
@@ -1807,8 +1852,9 @@ namespace Classificador_de_Peças
                         MAList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
 
                     }
+                    var PortasFree = new[] { "12", "37", "51" };
                     // INSERÇÃO NA LISTA DE MONTAGEM DE PERFIL (MP) 
-                    if (armazenar.PostosOperativos.Contains("MP"))
+                    if (armazenar.PostosOperativos.Contains("MP") && !(armazenar.DescricaoPeca.Contains("FREE") && PortasFree.Contains(armazenar.Espessura)) && !armazenar.PostosOperativos.Contains("ME")) // Nao insere as portas free
                     {
                         MPList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
 
@@ -2292,7 +2338,7 @@ namespace Classificador_de_Peças
                     }
 
                 }
-               
+
                 PainelSecundario.AppendText($"\n\n{contagemList.Count()} peça(s) classificada(s).");
                 PainelSecundario.ScrollToCaret();
 
@@ -2617,8 +2663,9 @@ namespace Classificador_de_Peças
                         }
 
                     }
-                    
-                    RelatorioPerfil(MPList);
+
+                    RelatorioMoPerfil(MPList);
+                    RelatorioMoEletrica(MEList);
 
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
@@ -3289,7 +3336,103 @@ namespace Classificador_de_Peças
 
 
         }
-        public void RelatorioPerfil(List<Armazenado> ListaMP)
+
+        public void RelatorioMoEletrica(List<Armazenado> ListaME)
+        {
+            if (csvPerfilCarregado == false)
+            {
+                PainelSecundario.AppendText("Nenhum CSV de perfil carregado, lista de ME não gerada.");
+                PainelSecundario.ScrollToCaret();
+                return;
+            }
+            var codigosME = File.ReadAllLines(@"J:\PCP\InfoPecasPlanos\PERFIL\MO ELETRICA.txt");
+            //var codigosME = File.ReadAllLines(@"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\PERFIL\MO ELETRICA.txt");
+            List<string> codigosMEList = new List<string>();
+            foreach (var i in codigosME)
+            {
+                codigosMEList.Add(i);
+            }
+
+            DataTable tableMP = new DataTable();
+            tableMP.Columns.Add("NÚMERO DO PEDIDO");
+            tableMP.Columns.Add("RAZãO SOCIAL CLIENTE");
+            tableMP.Columns.Add("ORDEM COMPRA PEDIDO");
+            tableMP.Columns.Add("NOME PLANEJADOR");
+            tableMP.Columns.Add("QUANTIDADE");
+            tableMP.Columns.Add("ALTURA PEÇA");
+            tableMP.Columns.Add("LARGURA PEÇA");
+            tableMP.Columns.Add("ESPESSURA PEÇA");
+            tableMP.Columns.Add("CÓDIGO MATERIAL");
+            tableMP.Columns.Add("DESCRIÇãO MATERIAL");
+            tableMP.Columns.Add("LARGURA CORTE MATERIAL");
+            tableMP.Columns.Add("ALTURA CORTE MATERIAL");
+            tableMP.Columns.Add("IMAGEM DO MATERIAL");
+            tableMP.Columns.Add("CÓDIGO PEÇA");
+            tableMP.Columns.Add("COMPLEMENTO");
+            tableMP.Columns.Add("DESCRIÇãO PEÇA");
+            tableMP.Columns.Add("DESENHO PROGRAMADO 1");
+            tableMP.Columns.Add("DESENHO PROGRAMADO 2");
+            tableMP.Columns.Add("DESENHO PROGRAMADO 3");
+            tableMP.Columns.Add("VEIO MATERIAL");
+            tableMP.Columns.Add("BORDA SUPERIOR");
+            tableMP.Columns.Add("BORDA INFERIOR");
+            tableMP.Columns.Add("BORDA ESQUERDA");
+            tableMP.Columns.Add("BORDA DIREITA");
+            tableMP.Columns.Add("DESTINO IMPRESSãO");
+            tableMP.Columns.Add("ID");
+            tableMP.Columns.Add("POSTOS OPERATIVOS");
+            tableMP.Columns.Add("NÚMERO DO LOTE");
+            tableMP.Columns.Add("CÓDIGO CLIENTE");
+            tableMP.Columns.Add("MODULO_ID");
+            tableMP.Columns.Add("NÚMERO DA ORDEM");
+            tableMP.Columns.Add("DATA ENTREGA LOTE");
+            tableMP.Columns.Add("BOX");
+            tableMP.Columns.Add("ESPECIAL");
+
+            var listaPerfis = File.ReadAllLines(caminhocsvPerfil).Skip(1); // listaPerfis recebe as linhas do csv de perfil, pulando a primeira linha (cabeçalho)
+            
+            var listaNovaME = new List<Armazenado>();
+
+
+            foreach (var mdf in ListaME)
+            {
+                Armazenado mdfME = mdf;
+                foreach (var perfil in listaPerfis)
+                {
+                    Armazenado perfilME = perfil;
+                    if (perfilME.Modulo == mdfME.Modulo && codigosMEList.Contains(perfilME.CodigoMaterial)) // verifica se é o mesmo modulo e verifica se o perfil está na lista de codigo definidos que vai para o ME
+                    {
+                        if (!listaNovaME.Any(p => p.NumeroOrdem == mdfME.NumeroOrdem))
+                            listaNovaME.Add(mdfME);
+                        if (!listaNovaME.Any(p => p.NumeroOrdem == perfilME.NumeroOrdem))
+                            listaNovaME.Add(perfilME);
+                    }
+                }
+
+            }
+
+            var listaOrdenada = listaNovaME.OrderBy(peca => peca.ERP)
+                .ThenBy(peca => peca.Planejador)
+                .ThenBy(peca => peca.DescricaoPeca)
+                .ToList();
+
+            listaOrdenada.ForEach(pecas =>
+            {
+                tableMP.Rows.Add(pecas.ERP, pecas.RazaoSocial, pecas.PedidoAmbiente, pecas.Planejador, pecas.Quantidade, pecas.Altura, pecas.Largura, pecas.Espessura, pecas.CodigoMaterial, pecas.DescricaoMaterial, pecas.LarguraCorte, pecas.AlturaCorte, pecas.ImagemMaterial, pecas.CodigoPeca, pecas.Complemento, pecas.DescricaoPeca, pecas.DesenhoUm, pecas.DesenhoDois, pecas.DesenhoTres, pecas.VeioMaterial, pecas.BordaSup, pecas.BordaInf, pecas.BordaEsq, pecas.BordaDir, pecas.DestinoImpressao, pecas.CodigoBarras, pecas.PostosOperativos, pecas.NumeroLote, pecas.CodigoCliente, pecas.Modulo, pecas.NumeroOrdem, pecas.DataEntrega, pecas.Plano, pecas.Especial);
+            });
+
+            using (XLWorkbook xlsRelatorioMP = new XLWorkbook())
+            {
+                xlsRelatorioMP.AddWorksheet(tableMP, "Sheet");
+                using (MemoryStream ns = new MemoryStream())
+                {
+                    xlsRelatorioMP.SaveAs(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\Relatorios de peças\ME.xlsx");
+                }
+
+            }
+
+        }
+        public void RelatorioMoPerfil(List<Armazenado> ListaMP)
         {
             if (csvPerfilCarregado == false)
             {
@@ -3297,10 +3440,10 @@ namespace Classificador_de_Peças
                 PainelSecundario.ScrollToCaret();
                 return;
             }
-            //var codigosMP = File.ReadAllLines(@"J:\PCP\InfoPecasPlanos\PERFIL\MO PERFIL.txt"); 
-            var codigosMP = File.ReadAllLines(@"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\PERFIL\MO PERFIL.txt");
+            var codigosMP = File.ReadAllLines(@"J:\PCP\InfoPecasPlanos\PERFIL\MO PERFIL.txt");
+            //var codigosMP = File.ReadAllLines(@"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\PERFIL\MO PERFIL.txt");
             List<string> codigosMPList = new List<string>();
-            foreach(var i in codigosMP)
+            foreach (var i in codigosMP)
             {
                 codigosMPList.Add(i);
             }
@@ -3341,50 +3484,105 @@ namespace Classificador_de_Peças
             tableMP.Columns.Add("BOX");
             tableMP.Columns.Add("ESPECIAL");
 
-            
 
 
 
+            var listSotilles = new List<string>();
 
             var listaNovaMP = new List<Armazenado>();
 
-            var listaPerfis = File.ReadAllLines(caminhocsvPerfil).Skip(1);
-            foreach (var lineMP in ListaMP)
+            var listaPerfis = File.ReadAllLines(caminhocsvPerfil).Skip(1); // listaPerfis recebe as linhas do csv de perfil, pulando a primeira linha (cabeçalho)
+            
+            foreach (var lineMP in ListaMP)                      // Passa pela Lista de MP para verificar o que de perfil pertence a cada peça
             {
-                Armazenado armMP = lineMP;
-
-                foreach (var linePerfil in listaPerfis)
+                int contagemSotille = 0;
+                Armazenado armMP = lineMP;                       // Cria um objeto do tipo Armazenado para cada linha da ListaMP, facilitando o acesso às propriedades de cada peça
+                if ((armMP.DescricaoPeca.Contains("SOTILLE") || armMP.DescricaoPeca.Contains("SAPATEIRA") )&& !listSotilles.Contains(armMP.Modulo + armMP.ERP)) // Caso seja porta sotille ou sapateira e já nao foi feita a contagem
                 {
-                    Armazenado armPerfil = linePerfil;
+                    listSotilles.Add(armMP.Modulo + armMP.ERP); // adiciona na lista de sotille o modulo + erp para nao refazer a contagem
+                    foreach (var item in ListaMP) // percorre novamente a lista de mdf mp
+                    {
+                        if(item.Modulo== armMP.Modulo && item.ERP == armMP.ERP) // filtra para ver se é o mesmo modulo e mesmo erp
+                        {
+                            
+                            if (item.DescricaoPeca.Contains(".DUP")) // Verifica se é porta com sotille duplo
+                                contagemSotille += 2; // faz contagem acrescida de 2 para portas com sotille duplo
+                            else
+                                contagemSotille += 1;// faz contagem acrescida de 1 para portas com sotille simples
+                            PainelSecundario.AppendText($"Amb: {armMP.PedidoAmbiente} - Modulo-ERP: {armMP.Modulo}-{armMP.ERP} = add contagem: {contagemSotille}\n");
+                            PainelSecundario.ScrollToCaret();
+                        }
+                    }
+                }
+                
+                
+                // Passa pela lista de perfis
+                foreach (var linePerfil in listaPerfis)          // Para cada linha do csv de perfil, verifica se o perfil pertence à peça da ListaMP
+                {
+                    Armazenado armPerfil = linePerfil;           // Cria um objeto do tipo Armazenado para cada linha da lista de perfis, facilitando o acesso às propriedades de cada perfil
                     bool contemPecaMdf = false;
                     bool contemPecaPerfil = false;
-                    foreach (var item in listaNovaMP)
+
+                    foreach (var item in listaNovaMP)    // Verifica se na nova lista MP tem o ordem de corte do MDF e do perfil para não adicionar duplicado
                     {
-                        if (item.NumeroOrdem == armMP.NumeroOrdem)
+                        if (item.NumeroOrdem == armMP.NumeroOrdem)       // Se o número da ordem do item da nova lista MP for igual ao número da ordem do MDF, então a variável contemPecaMdf recebe true
                             contemPecaMdf = true;
-                        if (item.NumeroOrdem == armPerfil.NumeroOrdem)
+                        if (item.NumeroOrdem == armPerfil.NumeroOrdem)   // Se o número da ordem do item da nova lista MP for igual ao número da ordem do perfil, então a variável contemPecaPerfil recebe true
                             contemPecaPerfil = true;
 
                     }
 
-                    if (armPerfil.Modulo == armMP.Modulo && armPerfil.ERP == armMP.ERP && codigosMPList.Contains(armPerfil.CodigoMaterial))
-                    {                       
-                        if (contemPecaMdf==false)
+                    // Para cada perfil que pertence ao MDF
+                    if (armPerfil.Modulo == armMP.Modulo &&
+                        armPerfil.ERP == armMP.ERP &&
+                        codigosMPList.Contains(armPerfil.CodigoMaterial))
+                    {
+                        // Adiciona MDF se não estiver na lista
+                        if (!listaNovaMP.Any(p => p.NumeroOrdem == armMP.NumeroOrdem))
                             listaNovaMP.Add(armMP);
 
-                        if (contemPecaPerfil == false)
+                        // Adiciona Cantoneira se atender à regra
+                        if (armPerfil.DescricaoPeca.Contains("CANTONEIRA") &&
+                            !armPerfil.DescricaoPeca.Contains("95,7") &&
+                            !armPerfil.DescricaoPeca.Contains("NATURAL") &&
+                            !listaNovaMP.Any(p => p.NumeroOrdem == armPerfil.NumeroOrdem))
                         {
-                            if (armPerfil.DescricaoPeca.Contains("CANTONEIRA"))
-                            {
-                                if (!armPerfil.DescricaoPeca.Contains("95,7"))
-                                    if (!armPerfil.DescricaoPeca.Contains("NATURAL"))
-                                        listaNovaMP.Add(armPerfil);
-                            }
-                            else
-                                listaNovaMP.Add(armPerfil);
+                            listaNovaMP.Add(armPerfil);
                         }
+                        // Se for SOTILLE
+                        else if (armPerfil.DescricaoPeca.Contains("SOTILLE") && contagemSotille > 0)
+                        {
+                            // Priorizar SOTILLE CUSTOMIZADO
+                            foreach (var item in listaPerfis)
+                            {
+                                Armazenado armCustom= item;
+                                if (armCustom.DescricaoPeca.Contains("SOTILLE CUSTOMIZADO") &&
+                                    armCustom.Modulo == armMP.Modulo &&
+                                    armCustom.ERP == armMP.ERP &&
+                                    !listaNovaMP.Any(p => p.NumeroOrdem == armCustom.NumeroOrdem))
+                                {
+                                    listaNovaMP.Add(item);
+                                    contagemSotille--;
+                                    
+                                }
+                            }
 
+                            // Adiciona o SOTILLE normal se ainda não estiver na lista
+                            if (!listaNovaMP.Any(p => p.NumeroOrdem == armPerfil.NumeroOrdem))
+                            {
+                                listaNovaMP.Add(armPerfil);
+                                contagemSotille--;                                
+                            }
+                        }
+                        // Perfis normais (não Cantoneira e não SOTILLE)
+                        else if (!armPerfil.DescricaoPeca.Contains("SOTILLE") &&
+                                 !armPerfil.DescricaoPeca.Contains("CANTONEIRA") &&
+                                 !listaNovaMP.Any(p => p.NumeroOrdem == armPerfil.NumeroOrdem))
+                        {
+                            listaNovaMP.Add(armPerfil);
+                        }
                     }
+                
                     // Painel Canaletado e Perfis canaletados
                     if (armMP.DescricaoPeca.Contains("CANALETADO") && contemPecaMdf == false)
                     {
@@ -4734,6 +4932,12 @@ namespace Classificador_de_Peças
                 csvPerfilCarregado = true;
 
             }
+        }
+
+        private void btnAtualizacoes_Click(object sender, EventArgs e)
+        {
+            var formAtt = new FormAtualizacoes();
+            formAtt.Show();
         }
     }
 

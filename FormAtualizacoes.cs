@@ -1,0 +1,147 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+
+namespace Classificador_de_Peças
+{
+    public partial class FormAtualizacoes : Form
+    {
+        // RichTextBox já definido no designer
+        private RichTextBox rtbAtualizacoes;
+        private Button btnFechar;
+
+        public FormAtualizacoes()
+        {
+            InitializeComponent();
+            InicializarComponentes();
+            CarregarAtualizacoes();
+        }
+
+        private void InicializarComponentes()
+        {
+            this.Text = "Notas de Atualização";
+            this.Size = new Size(500, 400);
+            this.StartPosition = FormStartPosition.CenterParent;
+
+            // RichTextBox
+            rtbAtualizacoes = new RichTextBox();
+            rtbAtualizacoes.Dock = DockStyle.Top;
+            rtbAtualizacoes.Height = 320;
+            rtbAtualizacoes.ReadOnly = true;
+            rtbAtualizacoes.ScrollBars = RichTextBoxScrollBars.Vertical;
+            rtbAtualizacoes.BackColor = Color.White;
+            rtbAtualizacoes.Font = new Font("Consolas", 10);
+
+            // Botão Fechar
+            btnFechar = new Button();
+            btnFechar.Text = "Fechar";
+            btnFechar.Width = 100;
+            btnFechar.Height = 30;
+            btnFechar.Top = rtbAtualizacoes.Bottom + 10;
+            btnFechar.Left = (this.ClientSize.Width - btnFechar.Width) / 2;
+            btnFechar.Anchor = AnchorStyles.Bottom;
+            btnFechar.Click += (s, e) => this.Close();
+
+            this.Controls.Add(rtbAtualizacoes);
+            this.Controls.Add(btnFechar);
+        }
+
+        private void CarregarAtualizacoes()
+        {
+            // Lista de atualizações
+            var lista = new List<Atualizacao>
+            {
+                new Atualizacao // Versão 
+                {
+                    Versao = "2.2 (Em produção)",
+                    Data = DateTime.Parse("2026-03-28"),
+                    Mudancas = new List<string>
+                    {
+                        "Relatório de Perfil (Pendencia)\n" +
+                        " --> Preciso fazer o mesmo do Sottile para o Curved, diferença que o Curved não vai na sapateira.\n"
+                        
+
+                    }
+                },
+                new Atualizacao // Versão 
+                {
+                    Versao = "2.1",
+                    Data = DateTime.Parse("2026-03-28"),
+                    Mudancas = new List<string>
+                    {
+                        "Relatório de Colagem (Pendencia)" +
+                        " --> Inserir os puxadores free na listagem de colagem.\n" +
+                        "Porta Passagem MPR 12mm SnowMatt - alteração automatica para 18mm e remoção da usinagem, o mesmo para a peça parceira.\n" +
+                        "Relatórios de Montagem de Perfil Ajustado.\n" +
+                        " --> Removido as portas de passagem free (12mm matéria-prima, 37mm colagem, 51mm colagem).\n" +
+                        " --> Removido os itens que são ME.\n" +
+                        " --> Adaptação ao Sotille para que saia apenas a contagem de acordo com a quantidade de MDF, priorizando o 'CUSTOMIZADO'. ", // Placeholder para futuras atualizações.
+                    }
+                },
+                new Atualizacao // Versão 2.0
+                {
+                    Versao = "2.0",
+                    Data = DateTime.Parse("2026-01-01"),
+                    Mudancas = new List<string>
+                    {
+                        "Mais intuitivo, acessibilidade e melhoria visual de dados.\n" +
+                        "Antes era Console.",
+                    }
+                },
+                new Atualizacao //  Versão 1.0
+                {
+                    
+                }
+            };
+
+            PreencherRichTextBox(lista);
+        }
+        private void rtbAtualizacoes_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PreencherRichTextBox(List<Atualizacao> lista)
+        {
+            rtbAtualizacoes.Clear();
+
+            var ordenada = lista.OrderByDescending(a => a.Data).ToList();
+
+            foreach (var at in ordenada)
+            {
+                // Título: Versão + Data
+                rtbAtualizacoes.SelectionFont = new Font("Consolas", 10, FontStyle.Bold);
+                rtbAtualizacoes.SelectionColor = Color.DarkBlue;
+                rtbAtualizacoes.AppendText($"Versão {at.Versao} - {at.Data:dd/MM/yyyy}\n");
+
+                // Separador
+                rtbAtualizacoes.SelectionFont = new Font("Consolas", 9, FontStyle.Italic);
+                rtbAtualizacoes.SelectionColor = Color.Gray;
+                rtbAtualizacoes.AppendText("------------------------\n");
+
+                // Mudanças
+                rtbAtualizacoes.SelectionFont = new Font("Consolas", 9, FontStyle.Regular);
+                rtbAtualizacoes.SelectionColor = Color.Black;
+
+                foreach (var item in at.Mudancas)
+                {
+                    rtbAtualizacoes.AppendText($"- {item}\n");
+                }
+
+                rtbAtualizacoes.AppendText("\n");
+            }
+        }
+    }
+
+    // Classe para manter cada atualização organizada
+    public class Atualizacao
+    {
+        public string Versao { get; set; }
+        public DateTime Data { get; set; }
+        public List<string> Mudancas { get; set; } = new List<string>();
+    }
+}
+
+
