@@ -92,9 +92,10 @@ namespace Classificador_de_Peças
                         " * Ajustado: Caminho do csv de perfil exception removido, agora o usuário pode classificar sem selecionar o csv de perfil com uma confirmação de seguir o processo.\n" +
                         " * Ajustado: MP e ME não geravam nem o MDF caso não tenha o csv de perfil carregado.\n" +
                         " * Ajustado: Lista de Colagem quebrando quando não encontrava a listagem de perfis. Agora gera somente MDF caso não tenha o csv de perfil.\n" +
-                        " * Melhoria: Melhoria visual das atualizações e fixado o valor mínimo para a janela." +
-                        " * Ajustado: Quando selecionado Unico CSV, já pré calcular a letra de cada csv que irá gerar." +
-                        " * Melhoria Código: Adicionado variável versao, ajustado para todas as janelas, alteração somente nesta variável reduzindo a alteração em vários form's."
+                        " * Melhoria: Melhoria visual das atualizações e fixado o valor mínimo para a janela.\n" +
+                        " * Ajustado: Quando selecionado Unico CSV, já pré calcular a letra de cada csv que irá gerar.\n" +
+                        " * Melhoria Código: Adicionado variável versao, ajustado para todas as janelas, alteração somente nesta variável reduzindo a alteração em vários form's.\n" +
+                        " * Ajustado: Ajustado os Perfis duplicando na lista de colagem."
 
                     }
                 }

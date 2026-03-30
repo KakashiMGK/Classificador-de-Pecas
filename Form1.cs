@@ -1825,7 +1825,7 @@ namespace Classificador_de_Peças
                             foreach (var i in listaPerfis)
                             {
                                 Armazenado perfil = i;
-                                if (perfil.Modulo == armazenar.Modulo && (perfil.DescricaoPeca.Contains("TRILHO GUIA") || perfil.DescricaoPeca.Contains("FREE")))
+                                if (perfil.Modulo == armazenar.Modulo && (perfil.DescricaoPeca.Contains("TRILHO GUIA") || perfil.DescricaoPeca.Contains("FREE")) && !COLAGEMList.Any(p => p.NumeroOrdem == perfil.NumeroOrdem))
                                     COLAGEMList.Add(perfil);
                             }
                         }
