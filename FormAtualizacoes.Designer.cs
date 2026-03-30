@@ -33,8 +33,9 @@
             // 
             // FormAtualizacoes
             // 
-            ClientSize = new Size(284, 261);
+            ClientSize = new Size(484, 361);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(500, 400);
             Name = "FormAtualizacoes";
             ResumeLayout(false);
 

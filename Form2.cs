@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -41,7 +42,9 @@ namespace Classificador_de_Peças
 
         private void Form2_Load(object sender, EventArgs e)
         {
-
+            var form1 = new Form1();
+            string versao = form1.versao;
+            this.Text = $"{versao} Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior";
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)

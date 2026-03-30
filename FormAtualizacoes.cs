@@ -21,7 +21,9 @@ namespace Classificador_de_Peças
 
         private void InicializarComponentes()
         {
-            this.Text = "Notas de Atualização";
+            var form1 = new Form1();
+            string versao = form1.versao;
+            this.Text = $"{versao} Notas de Atualização";
             this.Size = new Size(500, 400);
             this.StartPosition = FormStartPosition.CenterParent;
 
@@ -53,47 +55,61 @@ namespace Classificador_de_Peças
             // Lista de atualizações
             var lista = new List<Atualizacao>
             {
-                new Atualizacao // Versão 
-                {
-                    Versao = "2.2 (Em produção)",
-                    Data = DateTime.Parse("2026-03-28"),
-                    Mudancas = new List<string>
-                    {
-                        "Relatório de Perfil (Pendencia)\n" +
-                        " --> Preciso fazer o mesmo do Sottile para o Curved, diferença que o Curved não vai na sapateira.\n"
-                        
-
-                    }
-                },
-                new Atualizacao // Versão 
-                {
-                    Versao = "2.1",
-                    Data = DateTime.Parse("2026-03-28"),
-                    Mudancas = new List<string>
-                    {
-                        "Relatório de Colagem (Pendencia)" +
-                        " --> Inserir os puxadores free na listagem de colagem.\n" +
-                        "Porta Passagem MPR 12mm SnowMatt - alteração automatica para 18mm e remoção da usinagem, o mesmo para a peça parceira.\n" +
-                        "Relatórios de Montagem de Perfil Ajustado.\n" +
-                        " --> Removido as portas de passagem free (12mm matéria-prima, 37mm colagem, 51mm colagem).\n" +
-                        " --> Removido os itens que são ME.\n" +
-                        " --> Adaptação ao Sotille para que saia apenas a contagem de acordo com a quantidade de MDF, priorizando o 'CUSTOMIZADO'. ", // Placeholder para futuras atualizações.
-                    }
-                },
+                //new Atualizacao //  Versão 1.0
+                //{
+                    
+                //},
                 new Atualizacao // Versão 2.0
                 {
                     Versao = "2.0",
                     Data = DateTime.Parse("2026-01-01"),
                     Mudancas = new List<string>
                     {
-                        "Mais intuitivo, acessibilidade e melhoria visual de dados.\n" +
-                        "Antes era Console.",
+                        " * Mais intuitivo, acessibilidade e melhoria visual de dados.\n" +
+                        " * Antes era Console.",
+                    }
+                },                
+                new Atualizacao // Versão 
+                {
+                    Versao = "2.1",
+                    Data = DateTime.Parse("2026-03-28"),
+                    Mudancas = new List<string>
+                    {
+                        " * Inserção: Inserido os puxadores free e trilhos guia na listagem de colagem.\n" +
+                        " * Inserção: Relatórios de Montagem de Perfil e Montagem de Elétrica.\n" +
+                        " * Ajustado: Porta Passagem MPR 12mm SnowMatt - alteração automatica para 18mm e remoção da usinagem, o mesmo para a peça parceira.\n" +
+                        " * Ajustado: Relatórios de Montagem de Perfil removido as portas de passagem free (12mm matéria-prima, 37mm colagem, 51mm colagem).\n" +
+                        " * Ajustado: Relatórios de Montagem de Perfil removido os itens que são ME.\n" +
+                        " * Ajustado Adaptação ao Sotille para que saia apenas a contagem de acordo com a quantidade de MDF, priorizando o 'CUSTOMIZADO' que é referência à sapateira.", // Placeholder para futuras atualizações.
                     }
                 },
-                new Atualizacao //  Versão 1.0
+                new Atualizacao // Versão 
                 {
-                    
+                    Versao = "2.11",
+                    Data = DateTime.Parse("2026-03-30"),
+                    Mudancas = new List<string>
+                    {
+                        " * Ajustado: Caminho do csv de perfil exception removido, agora o usuário pode classificar sem selecionar o csv de perfil com uma confirmação de seguir o processo.\n" +
+                        " * Ajustado: MP e ME não geravam nem o MDF caso não tenha o csv de perfil carregado.\n" +
+                        " * Ajustado: Lista de Colagem quebrando quando não encontrava a listagem de perfis. Agora gera somente MDF caso não tenha o csv de perfil.\n" +
+                        " * Melhoria: Melhoria visual das atualizações e fixado o valor mínimo para a janela." +
+                        " * Ajustado: Quando selecionado Unico CSV, já pré calcular a letra de cada csv que irá gerar." +
+                        " * Melhoria Código: Adicionado variável versao, ajustado para todas as janelas, alteração somente nesta variável reduzindo a alteração em vários form's."
+
+                    }
                 }
+                //new Atualizacao // Versão 
+                //{
+                //    Versao = "2.2 (Em produção)",
+                //    Data = DateTime.Parse("2026-03-28"),
+                //    Mudancas = new List<string>
+                //    {
+                //        "Relatório de Perfil (Pendencia)\n" +
+                //        " --> Preciso fazer o mesmo do Sottile para o Curved, diferença que o Curved não vai na sapateira.\n"
+                        
+
+                //    }
+                //},   
             };
 
             PreencherRichTextBox(lista);
@@ -107,7 +123,8 @@ namespace Classificador_de_Peças
         {
             rtbAtualizacoes.Clear();
 
-            var ordenada = lista.OrderByDescending(a => a.Data).ToList();
+            var ordenada = lista.OrderBy(a => a.Data).ToList();
+            
 
             foreach (var at in ordenada)
             {
@@ -127,7 +144,7 @@ namespace Classificador_de_Peças
 
                 foreach (var item in at.Mudancas)
                 {
-                    rtbAtualizacoes.AppendText($"- {item}\n");
+                    rtbAtualizacoes.AppendText($"{item}\n");
                 }
 
                 rtbAtualizacoes.AppendText("\n");

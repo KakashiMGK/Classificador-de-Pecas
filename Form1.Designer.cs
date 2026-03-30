@@ -748,7 +748,6 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1349, 637);
             Name = "Form1";
-            Text = "[2.1] Classificador de Peças - Criado Por: Sergio Lucio de Oliveira Junior ";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
