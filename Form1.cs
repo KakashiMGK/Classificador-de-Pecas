@@ -367,22 +367,7 @@ namespace Classificador_de_Peças
             // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
             PainelSecundario.AppendText("\n\nContando as peças sem informação de plano.");
             PainelSecundario.ScrollToCaret();
-            foreach (var linha in lotecru)
-            {
-                Armazenado armazenar = linha;
-                string codigoBase;
-
-                int idx = armazenar.CodigoPeca.IndexOf('.');
-
-                if (idx >= 0)
-                {
-                    codigoBase = $"{armazenar.CodigoPeca[..idx]}.{armazenar.Espessura}";
-                }
-                else
-                {
-                    codigoBase = $"{armazenar.CodigoPeca}.{armazenar.Espessura}";
-                }
-                var todasAsListas = new HashSet<string>(
+            var todasAsListas = new HashSet<string>(
                     plpinfolhatxtList
                     .Concat(plpinfolhamotxtList)
                     .Concat(plripatxtList)
@@ -399,6 +384,22 @@ namespace Classificador_de_Peças
                     .Concat(plestrodapetxtList)
                     .Concat(plexcluirtxtList)
                 );
+            foreach (var linha in lotecru)
+            {
+                Armazenado armazenar = linha;
+                string codigoBase;
+
+                int idx = armazenar.CodigoPeca.IndexOf('.');
+
+                if (idx >= 0)
+                {
+                    codigoBase = $"{armazenar.CodigoPeca[..idx]}.{armazenar.Espessura}";
+                }
+                else
+                {
+                    codigoBase = $"{armazenar.CodigoPeca}.{armazenar.Espessura}";
+                }
+                
 
                 if (!todasAsListas.Contains(codigoBase))
                 {
@@ -3298,20 +3299,20 @@ namespace Classificador_de_Peças
                     PainelSecundario.ScrollToCaret();
                 });
 
-                //if (chckbxSobreescrever.Checked == false)
-                //{
-                //    PainelSecundario.AppendText("COPIANDO ARQUIVOS DE MAQUINA (SOMENTE QUE NAO EXISTE)");
-                //    PainelSecundario.ScrollToCaret();
+                if (chckbxSobreescrever.Checked == false)
+                {
+                    PainelSecundario.AppendText("\nCOPIANDO ARQUIVOS DE MAQUINA (SOMENTE QUE NAO EXISTE)");
+                    PainelSecundario.ScrollToCaret();
 
-                //    await CopiarArquivosMaquina(progress);
-                //}
-                //else
-                //{
-                //    PainelSecundario.AppendText("COPIANDO ARQUIVOS DE MAQUINA (SOBREESCREVER)");
-                //    PainelSecundario.ScrollToCaret();
+                    await CopiarArquivosMaquina(progress);
+                }
+                else
+                {
+                    PainelSecundario.AppendText("\nCOPIANDO ARQUIVOS DE MAQUINA (SOBREESCREVER)");
+                    PainelSecundario.ScrollToCaret();
 
-                //    await CopiarArquivosMaquinaSobreescrever(progress);
-                //}
+                    await CopiarArquivosMaquinaSobreescrever(progress);
+                }
                 bloquearFecha = false;
                 // Forma correta e simplificada
 
