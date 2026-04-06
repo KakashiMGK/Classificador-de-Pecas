@@ -155,8 +155,14 @@ namespace Classificador_de_Peças
                     foreach (var linha in lotecru)
                     {
                         Armazenado armazenar = linha;
-                        decimal altura = decimal.Parse(armazenar.Altura, CultureInfo.InvariantCulture);
-                        decimal largura = decimal.Parse(armazenar.Largura, CultureInfo.InvariantCulture);
+
+                        // Normaliza a string, substituindo vírgula por ponto e removendo espaços
+                        string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
+                        string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
+
+                        // Converte para decimal usando InvariantCulture
+                        decimal altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
+                        decimal largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
 
                         dataGridView1.Rows.Add(armazenar.ERP, armazenar.RazaoSocial, armazenar.PedidoAmbiente, armazenar.Planejador, armazenar.Quantidade, altura, largura, armazenar.Espessura, armazenar.CodigoMaterial, armazenar.DescricaoMaterial, armazenar.LarguraCorte, armazenar.AlturaCorte, armazenar.ImagemMaterial, armazenar.CodigoPeca, armazenar.Complemento, armazenar.DescricaoPeca, armazenar.DesenhoUm, armazenar.DesenhoDois, armazenar.DesenhoTres, armazenar.VeioMaterial, armazenar.BordaSup, armazenar.BordaInf, armazenar.BordaEsq, armazenar.BordaDir, armazenar.DestinoImpressao, armazenar.CodigoBarras, armazenar.PostosOperativos, armazenar.NumeroLote, armazenar.CodigoCliente, armazenar.Modulo, armazenar.NumeroOrdem, armazenar.DataEntrega, armazenar.Plano, armazenar.Especial);
                         qntdpecasgrid++;
@@ -693,10 +699,13 @@ namespace Classificador_de_Peças
                     bool condicoesUnicaNesting = false;
 
 
+                    // Normaliza a string, substituindo vírgula por ponto e removendo espaços
+                    string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
+                    string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
 
-                    decimal altura = decimal.Parse(armazenar.Altura, CultureInfo.InvariantCulture);
-                    decimal largura = decimal.Parse(armazenar.Largura, CultureInfo.InvariantCulture);
-
+                    // Converte para decimal usando InvariantCulture
+                    decimal altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
+                    decimal largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
 
                     if (
                         !matTouch.Contains(armazenar.CodigoMaterial) &&
@@ -1316,8 +1325,14 @@ namespace Classificador_de_Peças
                     if (armazenar.CodigoMaterial.Length == 4)
                         armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 1);
 
-                    decimal altura = decimal.Parse(armazenar.Altura, CultureInfo.InvariantCulture);
-                    decimal largura = decimal.Parse(armazenar.Largura, CultureInfo.InvariantCulture);
+                    // Normaliza a string, substituindo vírgula por ponto e removendo espaços
+                    string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
+                    string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
+
+                    // Converte para decimal usando InvariantCulture
+                    decimal altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
+                    decimal largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
+
                     // verifica se tem porta mpr de 12mm
                     if (armazenar.CodigoMaterial.Contains("12161") && armazenar.DescricaoPeca.Length >= 3 && armazenar.DescricaoPeca.Substring(0, 3) == "MPR" && armazenar.CodigoPeca.Contains("POPA")) // Caso seja uma materia prima de 12mm
                     {
@@ -1556,8 +1571,13 @@ namespace Classificador_de_Peças
                     if (armazenar.CodigoMaterial.Length == 4)
                         armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 1);
 
-                    decimal altura = decimal.Parse(armazenar.Altura, CultureInfo.InvariantCulture);
-                    decimal largura = decimal.Parse(armazenar.Largura, CultureInfo.InvariantCulture);
+                    // Normaliza a string, substituindo vírgula por ponto e removendo espaços
+                    string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
+                    string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
+
+                    // Converte para decimal usando InvariantCulture
+                    decimal altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
+                    decimal largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
 
                     // ALTERACAO DOS CAMPOS DA COLUNA DE NUMERO DO LOTE
                     if (!armazenar.PostosOperativos.Contains("PIN") || !armazenar.PostosOperativos.Contains("FL"))
