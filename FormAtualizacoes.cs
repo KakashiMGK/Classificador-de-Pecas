@@ -98,6 +98,14 @@ namespace Classificador_de_Peças
                         " * Ajustado: Ajustado os Perfis duplicando na lista de colagem."
 
                     }
+                    Versao = "2.12",
+                    Data = DateTime.Parse("2026-03-30"),
+                    Mudancas = new List<string>
+                    {
+                        " * Ajustado: Regra no Base Calceiro que não contém MP faz a inserção no Posto Operativo.\n" +
+                  
+
+                    }
                 }
                 //new Atualizacao // Versão 
                 //{
