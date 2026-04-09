@@ -4709,13 +4709,13 @@ namespace Classificador_de_Peças
             {
                 //smtp.Host = "smtp.gmail.com";
                 smtp.EnableSsl = true;
-                smtp.Credentials = new NetworkCredential("sergio.oliveirajr98@gmail.com", "basc vrna ynqp szbh");
+                smtp.Credentials = new NetworkCredential("", "");
 
                 using (MailMessage msg = new MailMessage())
                 {
                     var nomedoarquivo = System.IO.Path.GetFileNameWithoutExtension(caminhocolado2);
-                    msg.From = new MailAddress("sergio.oliveirajr98@gmail.com");
-                    msg.To.Add(new MailAddress("sergio.oliveirajr98@gmail.com"));
+                    msg.From = new MailAddress("");
+                    msg.To.Add(new MailAddress(""));
                     msg.Subject = $"Classificação de Peças - {nomedoarquivo} - {qntdpecasgrid} peças";
                     msg.Body = $"Olá,\n" +
                         $"Segue relatório da classificação do arquivo: {nomedoarquivo}\n\n" +
