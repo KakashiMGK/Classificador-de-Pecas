@@ -1700,8 +1700,13 @@ namespace Classificador_de_Peças
                     // FRENTE DISPENSER SEM MP
                     if (armazenar.DescricaoPeca.Contains("DISPENSER") && !armazenar.PostosOperativos.Contains("MP"))
                         armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // BASE CALCEIRO SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("BASE CALCEIRO") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+
                     // FILTRA A MATERIA PRIMA QUE SEJA '12161' SNOW MAT QUE NAO EXISTE, LOCALIZAR A OUTRA MATERIA PRIMA E ALTERAR AS DUAS PARA 18MM
-                    
+
+
                     // Encontra a peça parceira que terá que fazer a troca de 12 para 18mm
                     bool trocar12To18 = listaAlt12To18.Any(p => p.NumeroOrdem == armazenar.NumeroOrdem);
                     if (trocar12To18 == true)
