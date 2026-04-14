@@ -531,8 +531,6 @@ namespace Classificador_de_Peças
 
                 var loteCru = File.ReadLines(caminhocolado2).Skip(1);
 
-
-
                 // AS LISTAS PARA A EXPLOSAO DO CSV PARA OTIMIZACAO
                 var plpinfolhaList = new List<Armazenado> { }; // PLANO A
                 var plripaList = new List<Armazenado> { }; // PLANO B
@@ -548,11 +546,6 @@ namespace Classificador_de_Peças
 
                 var listaAmbientesFolha = new List<string> { };
                 var listaPinturaFolha = new List<string> { };
-
-
-
-
-
 
 
                 // Materias-Primas que não podem ir para o Nesting
@@ -600,7 +593,6 @@ namespace Classificador_de_Peças
                         armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 2);
                     if (armazenar.CodigoMaterial.Length == 4)
                         armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 1);
-
 
                     // ALTERACAO DOS CAMPOS DA COLUNA DE NUMERO DO LOTE
                     if (!armazenar.PostosOperativos.Contains("PIN") || !armazenar.PostosOperativos.Contains("FL"))
@@ -1025,6 +1017,44 @@ namespace Classificador_de_Peças
             tabelaMatPrimaNaoExiste.Columns.Add("BOX");
             tabelaMatPrimaNaoExiste.Columns.Add("ESPECIAL");
 
+            DataTable tabelaDXF = new DataTable();
+            tabelaDXF.Columns.Add("NÚMERO DO PEDIDO");
+            tabelaDXF.Columns.Add("RAZãO SOCIAL CLIENTE");
+            tabelaDXF.Columns.Add("ORDEM COMPRA PEDIDO");
+            tabelaDXF.Columns.Add("NOME PLANEJADOR");
+            tabelaDXF.Columns.Add("QUANTIDADE");
+            tabelaDXF.Columns.Add("ALTURA PEÇA");
+            tabelaDXF.Columns.Add("LARGURA PEÇA");
+            tabelaDXF.Columns.Add("ESPESSURA PEÇA");
+            tabelaDXF.Columns.Add("CÓDIGO MATERIAL");
+            tabelaDXF.Columns.Add("DESCRIÇãO MATERIAL");
+            tabelaDXF.Columns.Add("LARGURA CORTE MATERIAL");
+            tabelaDXF.Columns.Add("ALTURA CORTE MATERIAL");
+            tabelaDXF.Columns.Add("IMAGEM DO MATERIAL");
+            tabelaDXF.Columns.Add("CÓDIGO PEÇA");
+            tabelaDXF.Columns.Add("COMPLEMENTO");
+            tabelaDXF.Columns.Add("DESCRIÇãO PEÇA");
+            tabelaDXF.Columns.Add("DESENHO PROGRAMADO 1");
+            tabelaDXF.Columns.Add("DESENHO PROGRAMADO 2");
+            tabelaDXF.Columns.Add("DESENHO PROGRAMADO 3");
+            tabelaDXF.Columns.Add("VEIO MATERIAL");
+            tabelaDXF.Columns.Add("BORDA SUPERIOR");
+            tabelaDXF.Columns.Add("BORDA INFERIOR");
+            tabelaDXF.Columns.Add("BORDA ESQUERDA");
+            tabelaDXF.Columns.Add("BORDA DIREITA");
+            tabelaDXF.Columns.Add("DESTINO IMPRESSãO");
+            tabelaDXF.Columns.Add("ID");
+            tabelaDXF.Columns.Add("POSTOS OPERATIVOS");
+            tabelaDXF.Columns.Add("NÚMERO DO LOTE");
+            tabelaDXF.Columns.Add("CÓDIGO CLIENTE");
+            tabelaDXF.Columns.Add("MODULO_ID");
+            tabelaDXF.Columns.Add("NÚMERO DA ORDEM");
+            tabelaDXF.Columns.Add("DATA ENTREGA LOTE");
+            tabelaDXF.Columns.Add("BOX");
+            tabelaDXF.Columns.Add("ESPECIAL");
+            int contpecasDXF = 0;
+            int contNavalParaNormal = 0;
+
             // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
             PainelSecundario.AppendText("\n\nCriandos as colunas da tabela Bruto.");
             PainelSecundario.ScrollToCaret();
@@ -1175,6 +1205,7 @@ namespace Classificador_de_Peças
                 var matNaoExisteList = new List<Armazenado> { }; // Lista para arquivo XLSX de Materias que não existe
                 var brutoList = new List<Armazenado> { }; // Lista para receber todas as peças para produzir o arquivo bruto .xlsx
                 var brutoGeralList = new List<Armazenado> { }; // Lista para receber todas as peças para produzir o arquivo bruto .xlsx
+                var pecasDXF = new List<Armazenado> { }; // Lista para receber todas as peças para produzir em arquivo DXF
 
                 var pecasCodigoBarrasErradoList = new List<Armazenado> { }; // Lista das Peças com Códigos Errados
 
@@ -1239,6 +1270,7 @@ namespace Classificador_de_Peças
                 int qntdMatNaoExiste = 0;
                 int qntdBruto = 0;
                 int qntdpecasCodigoBarrasErrado = 0;
+                
 
                 int qntdrestantesList = 0;
 
@@ -1279,24 +1311,25 @@ namespace Classificador_de_Peças
                 PainelSecundario.AppendText("\n\nAdicionando cabeçalho nas listas dos planos.");
                 PainelSecundario.ScrollToCaret();
 
+                string cabecalho = "NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL";
                 // ADICIONA O CABEÇALHO PARA TODOS OS PLANOS
-                plpinfolhaList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plripaList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                pl18List.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                pl25List.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                ploutrosList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plimprimirList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plexcluirList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plnesting12mmList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plnesting15mmList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plnesting18mmList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                plnesting25mmList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
-                restantesList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
+                plpinfolhaList.Add(cabecalho);
+                plripaList.Add(cabecalho);
+                pl18List.Add(cabecalho);
+                pl25List.Add(cabecalho);
+                ploutrosList.Add(cabecalho);
+                plimprimirList.Add(cabecalho);
+                plexcluirList.Add(cabecalho);
+                plnesting12mmList.Add(cabecalho);
+                plnesting15mmList.Add(cabecalho);
+                plnesting18mmList.Add(cabecalho);
+                plnesting25mmList.Add(cabecalho);
+                restantesList.Add(cabecalho);
 
 
                 if (unicoCSV == true)
                 {
-                    brutoList.Add("NUMERO DO PEDIDO;RAZAO SOCIAL CLIENTE;ORDEM COMPRA PEDIDO;NOME PLANEJADOR;QUANTIDADE;ALTURA PECA;LARGURA PECA;ESPESSURA PECA;CODIGO MATERIAL;DESCRICAO MATERIAL;LARGURA CORTE MATERIAL;ALTURA CORTE MATERIAL;IMAGEM DO MATERIAL;CODIGO PECA;COMPLEMENTO;DESCRICAO PECA;DESENHO PROGRAMADO 1;DESENHO PROGRAMADO 2;DESENHO PROGRAMADO 3;VEIO MATERIAL;BORDA SUPERIOR;BORDA INFERIOR;BORDA ESQUERDA;BORDA DIREITA;DESTINO IMPRESSAO;ID;POSTOS OPERATIVOS;NUMERO DO LOTE;CODIGO CLIENTE;MODULO_ID;NUMERO DA ORDEM;DATA ENTREGA LOTE;PLANO;ESPECIAL");
+                    brutoList.Add(cabecalho);
                 }
 
 
@@ -1352,7 +1385,7 @@ namespace Classificador_de_Peças
                                 // caso localize adicione na lista para quando o foreach passar novamente ele fazer a troca de espessura no codigo seguinte
                                 if (!listaAlt12To18.Any(p => p.NumeroOrdem == arm2.NumeroOrdem))
                                     listaAlt12To18.Add(arm2);
-                                PainelSecundario.AppendText($"\n\nPeça parceira encontrada para alteração de 12mm para 18mm. Peça: {arm2.CodigoPeca} - {arm2.DescricaoPeca}");
+                                PainelSecundario.AppendText($"\n\nPeça parceira encontrada para alteração de 12mm para 18mm. Peça: {arm2.CodigoPeca} - {arm2.DescricaoPeca}\n");
                                 PainelSecundario.ScrollToCaret();
                             }
                         }
@@ -1556,7 +1589,7 @@ namespace Classificador_de_Peças
                 PainelSecundario.AppendText("\n\nAnalise de quantidades e alterações feitas.");
                 PainelSecundario.ScrollToCaret();
 
-                
+                var cont = 0;
 
                 foreach (var linha in listaCalculoM2)
                 {
@@ -1569,15 +1602,26 @@ namespace Classificador_de_Peças
                     if (armazenar.CodigoMaterial.Length == 5)
                         armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 2);
                     if (armazenar.CodigoMaterial.Length == 4)
-                        armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 1);
+                        armazenar.Espessura = armazenar.CodigoMaterial.Substring(0, 1);                   
 
-                    // Normaliza a string, substituindo vírgula por ponto e removendo espaços
-                    string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
-                    string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
+                    decimal altura = 0m;
 
-                    // Converte para decimal usando InvariantCulture
-                    decimal altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
-                    decimal largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
+                    decimal largura = 0m;
+                    // Tente Converte para decimal usando InvariantCulture
+                    try
+                    {
+                        // Normaliza a string, substituindo vírgula por ponto e removendo espaços
+                        string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
+                        string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
+                        altura = decimal.Parse(alturaStr, CultureInfo.InvariantCulture);
+                        largura = decimal.Parse(larguraStr, CultureInfo.InvariantCulture);
+                    }
+                    catch (Exception ex) 
+                    {
+                        MessageBox.Show("Erro ao converter altura ou largura para decimal. Verifique os dados de entrada. Detalhes do erro: " + ex.Message);
+                    }
+
+                    
 
                     // ALTERACAO DOS CAMPOS DA COLUNA DE NUMERO DO LOTE
                     if (!armazenar.PostosOperativos.Contains("PIN") || !armazenar.PostosOperativos.Contains("FL"))
@@ -1703,10 +1747,40 @@ namespace Classificador_de_Peças
                     // BASE CALCEIRO SEM MP INSERE MP
                     if (armazenar.DescricaoPeca.Contains("BASE CALCEIRO") && !armazenar.PostosOperativos.Contains("MP"))
                         armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE CHAMFER SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("CHAMFER") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE HALF SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("HALF") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE ITALIAN SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("ITALIAN") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE SOTILLE SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("SOTILLE") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE CURVED SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("CURVED") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+                    // PORTA/FRENTE OCULT SEM MP INSERE MP
+                    if (armazenar.DescricaoPeca.Contains("OCULT") && !armazenar.PostosOperativos.Contains("MP"))
+                        armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
+
+
+                    // Temporáriamente alterando o Cru Naval para Cru das peças que não contém FL
+                    if (armazenar.CodigoMaterial.Contains("051") && !armazenar.PostosOperativos.Contains("FL")) 
+                    {
+                        armazenar.CodigoMaterial = armazenar.CodigoMaterial.Replace("051", "050"); // troca o código do material para o cru normal
+                        if (armazenar.DescricaoMaterial.Contains("NAVAL"))  // Faz a verificaçã ose contém "naval" para nao dar exception
+                            armazenar.DescricaoMaterial = armazenar.DescricaoMaterial.Replace("NAVAL", " - Alterado para Cru Normal"); // remove a palavra naval da descrição do material para evitar confusão, já que o código do material foi alterado para o cru normal
+                        PainelSecundario.AppendText($"\n\nPeça com código de material de Cru Naval encontrado, mas sem FL no posto operativo. Código do material alterado para Cru Normal. Peça de Ordem: {armazenar.NumeroOrdem}");
+                        PainelSecundario.ScrollToCaret();
+                        contNavalParaNormal++;
+                    }
+
+                    
 
                     // FILTRA A MATERIA PRIMA QUE SEJA '12161' SNOW MAT QUE NAO EXISTE, LOCALIZAR A OUTRA MATERIA PRIMA E ALTERAR AS DUAS PARA 18MM
-
-
                     // Encontra a peça parceira que terá que fazer a troca de 12 para 18mm
                     bool trocar12To18 = listaAlt12To18.Any(p => p.NumeroOrdem == armazenar.NumeroOrdem);
                     if (trocar12To18 == true)
@@ -1717,7 +1791,7 @@ namespace Classificador_de_Peças
                         armazenar.DescricaoPeca = armazenar.DescricaoPeca.Replace("X12X12X", "X18X18X");
                         armazenar.DescricaoMaterial = armazenar.DescricaoMaterial + " - ALT 12MM PARA 18MM";
                         armazenar.DesenhoUm = "Removido Usi"; // remove a usinagem por via das duvidas
-                        PainelSecundario.AppendText($"\n\nPeça alterada de 12mm para 18mm. Peça: {armazenar.CodigoPeca} - {armazenar.DescricaoPeca}");
+                        PainelSecundario.AppendText($"\n\nPeça alterada de 12mm para 18mm. Peça: {armazenar.CodigoPeca} - {armazenar.DescricaoPeca}\n");
                         PainelSecundario.ScrollToCaret();
                     }
 
@@ -1903,7 +1977,7 @@ namespace Classificador_de_Peças
                     }
                     var PortasFree = new[] { "12", "37", "51" };
                     // INSERÇÃO NA LISTA DE MONTAGEM DE PERFIL (MP) 
-                    if (armazenar.PostosOperativos.Contains("MP") && !(armazenar.DescricaoPeca.Contains("FREE") && PortasFree.Contains(armazenar.Espessura)) && !armazenar.PostosOperativos.Contains("ME")) // Nao insere as portas free
+                    if (armazenar.PostosOperativos.Contains("MP") && !(armazenar.DescricaoPeca.Contains("FREE") && PortasFree.Contains(armazenar.Espessura)) && !armazenar.CodigoPeca.Contains("POPA") && !armazenar.CodigoPeca.Contains("POSY") && !armazenar.PostosOperativos.Contains("ME")) // Nao insere as portas free
                     {
                         MPList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
 
@@ -2001,338 +2075,354 @@ namespace Classificador_de_Peças
                         if (armazenar.Espessura is "18" or "12" or "25" or "15")
                             condicoesUnicaNesting = true;
                     }
-
+                    
                     if (unicoCSV == true)
                     {
-                        if (armazenar.DescricaoPeca.Substring(0, 9) == "MAO AMIGA" && altura < 451)
+                        if (altura > 2700m && largura > 1800m)
                         {
-                            armazenar.Complemento = "G_EXCLUIR";
-                            plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                            qntdPLExcluir++;
-
+                            pecasDXF.Add(armazenar);
+                            contpecasDXF++;
                         }
-                        else if (plexcluirtxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura) || (armazenar.CodigoPeca.Contains("POSY00100") && armazenar.Espessura == "37"))
-                        {
-                            armazenar.Complemento = "G_EXCLUIR";
-                            plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                            qntdPLExcluir++;
-
-                        }
-                        else if (armazenar.Espessura == "12")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                        else
+                        {                            
+                            if (armazenar.DescricaoPeca.Substring(0, 9) == "MAO AMIGA" && altura < 451)
                             {
-                                plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLRipa++;
-                                armazenar.Complemento = "B_RIPA";
-
-                            }
-
-                        }
-                        else if (armazenar.Espessura == "18")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLRipa++;
-                                armazenar.Complemento = "B_RIPA";
-                            }
-
-                        }
-                        else if (armazenar.Espessura == "25" && !matTouch.Contains(armazenar.CodigoMaterial))
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLRipa++;
-                                armazenar.Complemento = "B_RIPA";
-                            }
-                        }
-                        else if (armazenar.Espessura == "15")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLRipa++;
-                                armazenar.Complemento = "B_RIPA";
-                            }
-                        }
-                        else if (armazenar.Espessura == "6" || armazenar.Espessura == "3")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                if (chckbxRipa.Checked == true)
-                                {
-                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdPLRipa++;
-                                    armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                        }
-                        else if (armazenar.Espessura == "37" || armazenar.Espessura == "51" || matTouch.Contains(armazenar.CodigoMaterial))
-                        {
-                            armazenar.Complemento = "F_IMPRIMIR";
-                            plimprimirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                            qntdPLImprimir++;
-
-                        }
-                    }
-                    else
-                    {
-                        if (armazenar.DescricaoPeca.Substring(0, 9) == "MAO AMIGA" && altura < 451)
-                        {
-                            armazenar.Complemento = "G_EXCLUIR";
-                            if (chckbxExcluir.Checked == true)
-                            {
+                                armazenar.Complemento = "G_EXCLUIR";
                                 plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
                                 qntdPLExcluir++;
+
                             }
-                            else
+                            else if (plexcluirtxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura) || (armazenar.CodigoPeca.Contains("POSY00100") && armazenar.Espessura == "37"))
                             {
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
-                        }
-                        else if (plexcluirtxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                        {
-                            armazenar.Complemento = "G_EXCLUIR";
-                            if (chckbxExcluir.Checked == true)
-                            {
+                                armazenar.Complemento = "G_EXCLUIR";
                                 plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
                                 qntdPLExcluir++;
-                            }
-                            else
-                            {
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
-                        }
-                        else if (armazenar.Espessura == "12")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                if (chckbxRipa.Checked == true)
-                                {
-                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdPLRipa++;
-                                    armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                            else if (condicoesUnicaNesting == true && chckbxNest12MM.Checked == true)
-                            {
-                                armazenar.Complemento = "NESTING_12MM";
-                                plnesting12mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLNesting12mm++;
-                            }
-                            else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
-                            {
-                                armazenar.Complemento = "A_PINFOLHA";
-                                plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLPinFolha++;
-                            }
-                            else if (chckbxOutros.Checked == true)
-                            {
-                                ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLOutros++;
-                                armazenar.Complemento = "E_OUTROS";
-                            }
-                            else
-                            {
-                                armazenar.Complemento = "RESTANTES";
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
 
-                        }
-                        else if (armazenar.Espessura == "18")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                            }
+                            else if (armazenar.Espessura == "12")
                             {
-                                if (chckbxRipa.Checked == true)
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
                                 {
                                     plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
                                     qntdPLRipa++;
                                     armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                            else if (condicoesUnicaNesting == true && chckbxNest18MM.Checked == true)
-                            {
-                                plnesting18mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLNesting18mm++;
-                                armazenar.Complemento = "NESTING_18MM";
-                            }
-                            else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
-                            {
-                                plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLPinFolha++;
-                                armazenar.Complemento = "A_PINFOLHA";
-                            }
-                            else if (chckbx18MM.Checked == true)
-                            {
-                                pl18List.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPL18mm++;
-                                armazenar.Complemento = "C_18MM";
-                            }
-                            else
-                            {
-                                armazenar.Complemento = "RESTANTES";
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
-                        }
-                        else if (armazenar.Espessura == "25" && !matTouch.Contains(armazenar.CodigoMaterial))
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                if (chckbxRipa.Checked == true)
-                                {
-                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdPLRipa++;
-                                    armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                            else if (condicoesUnicaNesting == true && armazenar.Espessura == "25" && chckbxNest25MM.Checked == true)
-                            {
-                                plnesting25mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLNesting25mm++;
-                                armazenar.Complemento = "NESTING_25MM";
-                            }
-                            else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
-                            {
-                                plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLPinFolha++;
-                                armazenar.Complemento = "A_PINFOLHA";
-                            }
-                            else if (chckbx25MM.Checked == true)
-                            {
-                                pl25List.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPL25mm++;
-                                armazenar.Complemento = "D_25MM";
-                            }
-                            else
-                            {
-                                armazenar.Complemento = "RESTANTES";
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
-                        }
-                        else if (armazenar.Espessura == "15")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                if (chckbxRipa.Checked == true)
-                                {
-                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdPLRipa++;
-                                    armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                            else if (condicoesUnicaNesting == true && armazenar.Espessura == "15" && chckbxNest15MM.Checked == true)
-                            {
-                                plnesting15mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLNesting15mm++;
-                                armazenar.Complemento = "NESTING_15MM";
-                            }
-                            else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
-                            {
-                                armazenar.Complemento = "A_PINFOLHA";
-                                plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLPinFolha++;
-                            }
-                            else if (chckbxOutros.Checked == true)
-                            {
-                                ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLOutros++;
-                                armazenar.Complemento = "E_OUTROS";
-                            }
-                            else
-                            {
-                                armazenar.Complemento = "RESTANTES";
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
-                        }
-                        else if (armazenar.Espessura == "6" || armazenar.Espessura == "3")
-                        {
-                            if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
-                            {
-                                if (chckbxRipa.Checked == true)
-                                {
-                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdPLRipa++;
-                                    armazenar.Complemento = "B_RIPA";
-                                }
-                                else
-                                {
-                                    armazenar.Complemento = "RESTANTES";
-                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                    qntdrestantesList++;
-                                }
-                            }
-                            else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
-                            {
-                                armazenar.Complemento = "A_PINFOLHA";
-                                plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLPinFolha++;
-                            }
-                            else if (chckbxOutros.Checked == true)
-                            {
-                                ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdPLOutros++;
-                                armazenar.Complemento = "E_OUTROS";
-                            }
-                            else
-                            {
-                                armazenar.Complemento = "RESTANTES";
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
-                            }
 
-                        }
-                        else if (armazenar.Espessura == "37" || armazenar.Espessura == "51" || matTouch.Contains(armazenar.CodigoMaterial))
-                        {
-                            armazenar.Complemento = "F_IMPRIMIR";
-                            if (chckbxImprimir.Checked == true)
+                                }
+
+                            }
+                            else if (armazenar.Espessura == "18")
                             {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLRipa++;
+                                    armazenar.Complemento = "B_RIPA";
+                                }
+
+                            }
+                            else if (armazenar.Espessura == "25" && !matTouch.Contains(armazenar.CodigoMaterial))
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLRipa++;
+                                    armazenar.Complemento = "B_RIPA";
+                                }
+                            }
+                            else if (armazenar.Espessura == "15")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLRipa++;
+                                    armazenar.Complemento = "B_RIPA";
+                                }
+                            }
+                            else if (armazenar.Espessura == "6" || armazenar.Espessura == "3")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                            }
+                            else if (armazenar.Espessura == "37" || armazenar.Espessura == "51" || matTouch.Contains(armazenar.CodigoMaterial))
+                            {
+                                armazenar.Complemento = "F_IMPRIMIR";
                                 plimprimirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
                                 qntdPLImprimir++;
+
                             }
-                            else
+                        }
+                    }
+                    else // Caso não esteja o UnicoCSV selecionado
+                    {
+                        if (altura > 2700m && largura > 1800m)
+                        {
+                            pecasDXF.Add(armazenar);
+                            contpecasDXF++;
+                        }
+                        else
+                        {
+                            if (armazenar.DescricaoPeca.Substring(0, 9) == "MAO AMIGA" && altura < 451)
                             {
-                                restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                                qntdrestantesList++;
+                                armazenar.Complemento = "G_EXCLUIR";
+                                if (chckbxExcluir.Checked == true)
+                                {
+                                    plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLExcluir++;
+                                }
+                                else
+                                {
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
                             }
-                        }// Fecha o Contem "." no Codigo peça
+                            else if (plexcluirtxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                            {
+                                armazenar.Complemento = "G_EXCLUIR";
+                                if (chckbxExcluir.Checked == true)
+                                {
+                                    plexcluirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLExcluir++;
+                                }
+                                else
+                                {
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+                            }
+                            else if (armazenar.Espessura == "12")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                                else if (condicoesUnicaNesting == true && chckbxNest12MM.Checked == true)
+                                {
+                                    armazenar.Complemento = "NESTING_12MM";
+                                    plnesting12mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLNesting12mm++;
+                                }
+                                else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
+                                {
+                                    armazenar.Complemento = "A_PINFOLHA";
+                                    plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLPinFolha++;
+                                }
+                                else if (chckbxOutros.Checked == true)
+                                {
+                                    ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLOutros++;
+                                    armazenar.Complemento = "E_OUTROS";
+                                }
+                                else
+                                {
+                                    armazenar.Complemento = "RESTANTES";
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+
+                            }
+                            else if (armazenar.Espessura == "18")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                                else if (condicoesUnicaNesting == true && chckbxNest18MM.Checked == true)
+                                {
+                                    plnesting18mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLNesting18mm++;
+                                    armazenar.Complemento = "NESTING_18MM";
+                                }
+                                else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
+                                {
+                                    plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLPinFolha++;
+                                    armazenar.Complemento = "A_PINFOLHA";
+                                }
+                                else if (chckbx18MM.Checked == true)
+                                {
+                                    pl18List.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPL18mm++;
+                                    armazenar.Complemento = "C_18MM";
+                                }
+                                else
+                                {
+                                    armazenar.Complemento = "RESTANTES";
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+                            }
+                            else if (armazenar.Espessura == "25" && !matTouch.Contains(armazenar.CodigoMaterial))
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                                else if (condicoesUnicaNesting == true && armazenar.Espessura == "25" && chckbxNest25MM.Checked == true)
+                                {
+                                    plnesting25mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLNesting25mm++;
+                                    armazenar.Complemento = "NESTING_25MM";
+                                }
+                                else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
+                                {
+                                    plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLPinFolha++;
+                                    armazenar.Complemento = "A_PINFOLHA";
+                                }
+                                else if (chckbx25MM.Checked == true)
+                                {
+                                    pl25List.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPL25mm++;
+                                    armazenar.Complemento = "D_25MM";
+                                }
+                                else
+                                {
+                                    armazenar.Complemento = "RESTANTES";
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+                            }
+                            else if (armazenar.Espessura == "15")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                                else if (condicoesUnicaNesting == true && armazenar.Espessura == "15" && chckbxNest15MM.Checked == true)
+                                {
+                                    plnesting15mmList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLNesting15mm++;
+                                    armazenar.Complemento = "NESTING_15MM";
+                                }
+                                else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
+                                {
+                                    armazenar.Complemento = "A_PINFOLHA";
+                                    plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLPinFolha++;
+                                }
+                                else if (chckbxOutros.Checked == true)
+                                {
+                                    ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLOutros++;
+                                    armazenar.Complemento = "E_OUTROS";
+                                }
+                                else
+                                {
+                                    armazenar.Complemento = "RESTANTES";
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+                            }
+                            else if (armazenar.Espessura == "6" || armazenar.Espessura == "3")
+                            {
+                                if (plripatxtList.Contains(armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura))
+                                {
+                                    if (chckbxRipa.Checked == true)
+                                    {
+                                        plripaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdPLRipa++;
+                                        armazenar.Complemento = "B_RIPA";
+                                    }
+                                    else
+                                    {
+                                        armazenar.Complemento = "RESTANTES";
+                                        restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                        qntdrestantesList++;
+                                    }
+                                }
+                                else if ((armazenar.PostosOperativos.Contains("PIN") || armazenar.PostosOperativos.Contains("FL") || listaPinturaFolha.Contains(armazenar.CodigoMaterial)) && chckbxPinFolha.Checked == true)
+                                {
+                                    armazenar.Complemento = "A_PINFOLHA";
+                                    plpinfolhaList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLPinFolha++;
+                                }
+                                else if (chckbxOutros.Checked == true)
+                                {
+                                    ploutrosList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLOutros++;
+                                    armazenar.Complemento = "E_OUTROS";
+                                }
+                                else
+                                {
+                                    armazenar.Complemento = "RESTANTES";
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+
+                            }
+                            else if (armazenar.Espessura == "37" || armazenar.Espessura == "51" || matTouch.Contains(armazenar.CodigoMaterial))
+                            {
+                                armazenar.Complemento = "F_IMPRIMIR";
+                                if (chckbxImprimir.Checked == true)
+                                {
+                                    plimprimirList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdPLImprimir++;
+                                }
+                                else
+                                {
+                                    restantesList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura.ToString() + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
+                                    qntdrestantesList++;
+                                }
+                            }// Fecha o Contem "." no Codigo peça
+                        }
                     }
                     // FIM DA SEPARACAO
 
@@ -2491,6 +2581,30 @@ namespace Classificador_de_Peças
                             xlsMatPrimaNaoExiste.SaveAs(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\" + numeroLote + "_MAT-PRIMA_NAO_EXISTE_" + qntdMatNaoExiste + ".xlsx");
                         }
 
+                    }
+                }
+                tabelaDXF.Rows.Clear(); 
+                
+                if (contpecasDXF > 0)
+                {
+                    pecasDXF.ForEach(pecas =>
+                    {
+                        tabelaDXF.Rows.Add(pecas.ERP, pecas.RazaoSocial, pecas.PedidoAmbiente, pecas.Planejador, pecas.Quantidade, pecas.Altura, pecas.Largura, pecas.Espessura, pecas.CodigoMaterial, pecas.DescricaoMaterial, pecas.LarguraCorte, pecas.AlturaCorte, pecas.ImagemMaterial, pecas.CodigoPeca, pecas.Complemento, pecas.DescricaoPeca, pecas.DesenhoUm, pecas.DesenhoDois, pecas.DesenhoTres, pecas.VeioMaterial, pecas.BordaSup, pecas.BordaInf, pecas.BordaEsq, pecas.BordaDir, pecas.DestinoImpressao, pecas.CodigoBarras, pecas.PostosOperativos, pecas.NumeroLote, pecas.CodigoCliente, pecas.Modulo, pecas.NumeroOrdem, pecas.DataEntrega, pecas.Plano, pecas.Especial);
+                    });
+                    using (XLWorkbook xlspecasDXF = new XLWorkbook())
+                    {
+                        xlspecasDXF.AddWorksheet(tabelaDXF, "Sheet");
+                        using (MemoryStream ns = new MemoryStream())
+                        {
+                            var nomePecasDXF = "";
+                            if (System.IO.Path.GetFileName(caminhocolado2).Contains("RETFAB", StringComparison.OrdinalIgnoreCase) == false)
+                                xlspecasDXF.SaveAs(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\" + nomeSubdoarquivo + "_ATENCAO_USAR_DXF_" + contpecasDXF + ".xlsx");
+                            else
+                            {
+                                nomePecasDXF = System.IO.Path.GetFileNameWithoutExtension(caminhocolado2);
+                                xlspecasDXF.SaveAs(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\" + nomeSubdoarquivo + "_ATENCAO_USAR_DXF_" + contpecasDXF + ".xlsx");
+                            }
+                        }
                     }
                 }
                 valorProgresso++;
@@ -2964,6 +3078,18 @@ namespace Classificador_de_Peças
                     PainelSecundario.AppendText($"\nQntd de pçs      - PL_NESTING_25MM: {qntdPLNesting25mm}");
                     PainelSecundario.AppendText($"\nQntd de pçs      - Restantes CSV: {qntdrestantesList}");
                     PainelSecundario.AppendText($"\n\nQntd de pçs      - BRUTO:           {qntdBrutoGeral}");
+
+                    if (qntdMatNaoExiste > 0)
+                        PainelSecundario.AppendText($"Qntd de pçs com matéria-prima que não existe: {qntdMatNaoExiste}.");
+                    if (contpecasDXF > 0)
+                    {
+                        PainelSecundario.AppendText($"Qntd de pçs que deverão usar DXF para cortar: {contpecasDXF}.");
+                        MessageBox.Show($"Há {contpecasDXF} peças para usar o DXF, essas peças foram removidas dos planos de corte e associadas ao Excel: {nomeSubdoarquivo}_ATENCAO_USAR_DXF_{contpecasDXF}.xlsx");
+                    }
+                   
+                    if (contNavalParaNormal > 0)
+                        PainelSecundario.AppendText($"Qntd de pçs que estavam no material Cru Naval (051) que não contém FL e foram convertidas para Cru normal (050): {contNavalParaNormal}.");
+                        
                     PainelSecundario.ScrollToCaret();
 
                     PainelSecundario.AppendText($"\n\nSoma de todos os planos é: {qntdPLPinFolha + qntdPLRipa + qntdPL18mm + qntdPL25mm + qntdPLOutros + qntdPLImprimir + qntdPLExcluir + qntdPLNesting12mm + qntdPLNesting15mm + qntdPLNesting18mm + qntdPLNesting25mm} pçs");
@@ -3560,8 +3686,8 @@ namespace Classificador_de_Peças
                                 contagemSotille += 2; // faz contagem acrescida de 2 para portas com sotille duplo
                             else
                                 contagemSotille += 1;// faz contagem acrescida de 1 para portas com sotille simples
-                            PainelSecundario.AppendText($"Amb: {armMP.PedidoAmbiente} - Modulo-ERP: {armMP.Modulo}-{armMP.ERP} = add contagem: {contagemSotille}\n");
-                            PainelSecundario.ScrollToCaret();
+                            //PainelSecundario.AppendText($"Amb: {armMP.PedidoAmbiente} - Modulo-ERP: {armMP.Modulo}-{armMP.ERP} = add contagem: {contagemSotille}\n");
+                            //PainelSecundario.ScrollToCaret();
                         }
                     }
                 }
@@ -3594,6 +3720,10 @@ namespace Classificador_de_Peças
                                 !armPerfil.DescricaoPeca.Contains("95,7") &&
                                 !armPerfil.DescricaoPeca.Contains("NATURAL") &&
                                 !listaNovaMP.Any(p => p.NumeroOrdem == armPerfil.NumeroOrdem))
+                            {
+                                listaNovaMP.Add(armPerfil);
+                            }
+                            else if (armPerfil.DescricaoPeca.Contains("TUBO ESTRIADO") && armMP.DescricaoPeca.Contains("DISPENSER"))
                             {
                                 listaNovaMP.Add(armPerfil);
                             }

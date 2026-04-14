@@ -97,13 +97,20 @@ namespace Classificador_de_Peças
                         " * Melhoria Código: Adicionado variável versao, ajustado para todas as janelas, alteração somente nesta variável reduzindo a alteração em vários form's.\n" +
                         " * Ajustado: Ajustado os Perfis duplicando na lista de colagem."
 
-                    }
+                    }                    
+                },
+                new Atualizacao
+                {
                     Versao = "2.12",
-                    Data = DateTime.Parse("2026-03-30"),
+                    Data = DateTime.Parse("2026-04-14"),
                     Mudancas = new List<string>
                     {
-                        " * Ajustado: Regra no Base Calceiro que não contém MP faz a inserção no Posto Operativo.\n" +
-                  
+                        " * Ajustado: Regra no Base Calceiro, Chamfer, Half, Italian, Ocult, Sotille e Curved que não contém MP faz a inserção no Posto Operativo.\n" +
+                        " * Melhoria do código: Diminuição de código para melhor performance.\n" +
+                        " * Ajuste Temporário: Peças que não contém 'FL' em posto operativo e que são Cru Naval (051), serão alterados para Cru Normal (050) temporáriamente até a baixa do estoque." +
+                        " * Ajustado: Tubo estriado entrando no Relatório de MP quando é outro MDF puxando o mesmo módulo, inserção da regra para que o MDF contenha 'DISPENSER'." 
+
+
 
                     }
                 }
