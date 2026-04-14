@@ -107,8 +107,8 @@ namespace Classificador_de_Peças
                     {
                         " * Ajustado: Regra no Base Calceiro, Chamfer, Half, Italian, Ocult, Sotille e Curved que não contém MP faz a inserção no Posto Operativo.\n" +
                         " * Melhoria do código: Diminuição de código para melhor performance.\n" +
-                        " * Ajuste Temporário: Peças que não contém 'FL' em posto operativo e que são Cru Naval (051), serão alterados para Cru Normal (050) temporáriamente até a baixa do estoque." +
-                        " * Ajustado: Tubo estriado entrando no Relatório de MP quando é outro MDF puxando o mesmo módulo, inserção da regra para que o MDF contenha 'DISPENSER'." 
+                        " * Ajustado: Tubo estriado entrando no Relatório de MP quando é outro MDF puxando o mesmo módulo, inserção da regra para que o MDF contenha 'DISPENSER'.\n" +
+                        " * Ajustado: Caso tente carregar csv de MDF em perfil ou vice-versa, ou caso não seja um formato válido de csv, o programa reseta e limpa tudo.\n" 
 
 
 

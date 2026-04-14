@@ -156,6 +156,29 @@ namespace Classificador_de_Peças
                     {
                         Armazenado armazenar = linha;
 
+                        if(string.IsNullOrWhiteSpace(armazenar.Altura) || string.IsNullOrWhiteSpace(armazenar.Largura)) // Se altura ou largura estiverem vazias ou forem apenas espaços em branco, exibe uma mensagem de erro indicando o código da peça e a ordem, e para a execução do código para evitar erros posteriores
+                        {
+                            MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem}  possui Altura ou Largura vazia. Verifique o arquivo CSV.", "Erro de Dimensões", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ResetaPrograma();
+                            return; // Para o codigo
+                        }
+                        if (int.TryParse(armazenar.CodigoMaterial, out _) == false) // Tenta fazer a coversão para inteiro do código de material, se não conseguir é porque tem letra ou caractere especial, o que é um código de matéria-prima inválido
+                        {
+                            MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem} possui código de matéria-prima inválida.", "Erro de Matéria-Prima", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ResetaPrograma();
+                            return; // Para o codigo
+                        }
+                        if (armazenar.Planejador.Length > 5)
+                        {
+                            if (armazenar.Planejador.Contains("PERFIL"))
+                            {
+                                MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem} possui Planejador de PERFIL. Verifique o arquivo CSV.", "Erro de Planejador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                ResetaPrograma();
+                                return; // Para o codigo
+                            }
+                        }
+                           
+
                         // Normaliza a string, substituindo vírgula por ponto e removendo espaços
                         string alturaStr = armazenar.Altura.Trim().Replace(",", ".");
                         string larguraStr = armazenar.Largura.Trim().Replace(",", ".");
@@ -1053,7 +1076,6 @@ namespace Classificador_de_Peças
             tabelaDXF.Columns.Add("BOX");
             tabelaDXF.Columns.Add("ESPECIAL");
             int contpecasDXF = 0;
-            int contNavalParaNormal = 0;
 
             // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
             PainelSecundario.AppendText("\n\nCriandos as colunas da tabela Bruto.");
@@ -1765,19 +1787,6 @@ namespace Classificador_de_Peças
                     // PORTA/FRENTE OCULT SEM MP INSERE MP
                     if (armazenar.DescricaoPeca.Contains("OCULT") && !armazenar.PostosOperativos.Contains("MP"))
                         armazenar.PostosOperativos = armazenar.PostosOperativos + "-MP";
-
-
-                    // Temporáriamente alterando o Cru Naval para Cru das peças que não contém FL
-                    if (armazenar.CodigoMaterial.Contains("051") && !armazenar.PostosOperativos.Contains("FL")) 
-                    {
-                        armazenar.CodigoMaterial = armazenar.CodigoMaterial.Replace("051", "050"); // troca o código do material para o cru normal
-                        if (armazenar.DescricaoMaterial.Contains("NAVAL"))  // Faz a verificaçã ose contém "naval" para nao dar exception
-                            armazenar.DescricaoMaterial = armazenar.DescricaoMaterial.Replace("NAVAL", " - Alterado para Cru Normal"); // remove a palavra naval da descrição do material para evitar confusão, já que o código do material foi alterado para o cru normal
-                        PainelSecundario.AppendText($"\n\nPeça com código de material de Cru Naval encontrado, mas sem FL no posto operativo. Código do material alterado para Cru Normal. Peça de Ordem: {armazenar.NumeroOrdem}");
-                        PainelSecundario.ScrollToCaret();
-                        contNavalParaNormal++;
-                    }
-
                     
 
                     // FILTRA A MATERIA PRIMA QUE SEJA '12161' SNOW MAT QUE NAO EXISTE, LOCALIZAR A OUTRA MATERIA PRIMA E ALTERAR AS DUAS PARA 18MM
@@ -3086,13 +3095,11 @@ namespace Classificador_de_Peças
                         PainelSecundario.AppendText($"Qntd de pçs que deverão usar DXF para cortar: {contpecasDXF}.");
                         MessageBox.Show($"Há {contpecasDXF} peças para usar o DXF, essas peças foram removidas dos planos de corte e associadas ao Excel: {nomeSubdoarquivo}_ATENCAO_USAR_DXF_{contpecasDXF}.xlsx");
                     }
-                   
-                    if (contNavalParaNormal > 0)
-                        PainelSecundario.AppendText($"Qntd de pçs que estavam no material Cru Naval (051) que não contém FL e foram convertidas para Cru normal (050): {contNavalParaNormal}.");
-                        
+                                      
                     PainelSecundario.ScrollToCaret();
 
-                    PainelSecundario.AppendText($"\n\nSoma de todos os planos é: {qntdPLPinFolha + qntdPLRipa + qntdPL18mm + qntdPL25mm + qntdPLOutros + qntdPLImprimir + qntdPLExcluir + qntdPLNesting12mm + qntdPLNesting15mm + qntdPLNesting18mm + qntdPLNesting25mm} pçs");
+                    PainelSecundario.AppendText($"\n\nSoma de todos os planos é: {qntdPLPinFolha + qntdPLRipa + qntdPL18mm + qntdPL25mm + qntdPLOutros + qntdPLImprimir + qntdPLExcluir + qntdPLNesting12mm + qntdPLNesting15mm + qntdPLNesting18mm + qntdPLNesting25mm} pçs" +
+                        $"\n e {contpecasDXF} de peças para cortar em DXF.");
                     PainelSecundario.ScrollToCaret();
                     //var ultimom2 = "";
 
@@ -3723,9 +3730,8 @@ namespace Classificador_de_Peças
                             {
                                 listaNovaMP.Add(armPerfil);
                             }
-                            else if (armPerfil.DescricaoPeca.Contains("TUBO ESTRIADO") && armMP.DescricaoPeca.Contains("DISPENSER"))
+                            else if (armPerfil.DescricaoPeca.Contains("TUBO ESTRIADO") && !armMP.DescricaoPeca.Contains("DISPENSER"))
                             {
-                                listaNovaMP.Add(armPerfil);
                             }
                             // Se for SOTILLE
                             else if (armPerfil.DescricaoPeca.Contains("SOTILLE") && contagemSotille > 0)
@@ -5107,6 +5113,43 @@ namespace Classificador_de_Peças
             if (buscaArquivo == DialogResult.OK)
             {
                 caminhocsvPerfil = ofd.FileName;
+                try
+                {
+                    var csvPerfil = File.ReadAllLines(caminhocsvPerfil).Skip(1);
+                    qntdpecasgrid = 0;
+
+                    foreach (var linha in csvPerfil)
+                    {
+                        Armazenado armazenar = linha;
+
+                        if (string.IsNullOrWhiteSpace(armazenar.Altura) || string.IsNullOrWhiteSpace(armazenar.Largura)) // Se altura ou largura estiverem vazias ou forem apenas espaços em branco, exibe uma mensagem de erro indicando o código da peça e a ordem, e para a execução do código para evitar erros posteriores
+                        {
+                            MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem}  possui Altura ou Largura vazia. Verifique o arquivo CSV.", "Erro de Dimensões", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ResetaPrograma();
+                            return; // Para o codigo
+                        }
+                        if (int.TryParse(armazenar.CodigoMaterial, out _) == true) // Tenta fazer a coversão para inteiro do código de material, se não conseguir é porque tem letra ou caractere especial, o que é um código de matéria-prima inválido
+                        {
+                            MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem} possui código de matéria-prima inválida.", "Erro de Matéria-Prima", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ResetaPrograma();
+                            return; // Para o codigo
+                        }
+                        if (armazenar.Planejador.Length > 6)
+                        {
+                            if (armazenar.Planejador.Contains("FABRICA"))
+                            {
+                                MessageBox.Show($"A peça com Código: {armazenar.CodigoPeca} e Ordem:{armazenar.NumeroOrdem} possui Planejador de FABRICA. Verifique o arquivo CSV.", "Erro de Planejador", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                ResetaPrograma();
+                                return; // Para o codigo
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro no processamento: {ex.Message}");
+                }
+
                 lblAgPerfil.Text = "Perfil Carregado";
                 label2.Text = "Status: CSV de Perfil Carregado.";
                 csvPerfilCarregado = true;
@@ -5118,6 +5161,73 @@ namespace Classificador_de_Peças
         {
             var formAtt = new FormAtualizacoes();
             formAtt.Show();
+        }
+        public void ResetaPrograma()
+        {
+            dataGridView1.Rows.Clear(); // Limpa as celulas do Data Grid
+            PararProgresso();
+
+            caminhocolado2 = "";
+            caminhocsvPerfil = "";
+            // Reseta quantidade de cada int
+            emailqntdPLPinFolha = 0;
+            emailqntdPLRipa = 0;
+            emailqntdPL18mm = 0;
+            emailqntdPL25mm = 0;
+            emailqntdPLOutros = 0;
+            emailqntdPLImprimir = 0;
+            emailqntdPLExcluir = 0;
+            emailqntdPLNesting12mm = 0;
+            emailqntdPLNesting15mm = 0;
+            emailqntdPLNesting18mm = 0;
+            emailqntdPLNesting25mm = 0;
+            emailqntdMatNaoExiste = 0;
+            emailqntdBruto = 0;
+            emailqntdpecasCodigoBarrasErrado = 0;
+
+            emailqntdPecasLote = 0;
+            emailqntdCMPLote = 0;
+            emailqntdCOLote = 0;
+            emailqntdBOLote = 0;
+            emailqntdFULote = 0;
+            emailqntdUSILote = 0;
+            emailqntdCFLote = 0;
+            emailqntdMOLote = 0;
+            emailqntdMALote = 0;
+            emailqntdMPLote = 0;
+            emailqntdMELote = 0;
+            emailqntdPINLote = 0;
+            emailqntdFLLote = 0;
+            emailqntdColagemLote = 0;
+            emailqntdCQLote = 0;
+            emailqntdFiletacaoLote = 0;
+
+            PREqntdPLPinFolha = 0;
+            PREqntdPLRipa = 0;
+            PREqntdPL18mm = 0;
+            PREqntdPL25mm = 0;
+            PREqntdPLOutros = 0;
+            PREqntdPLImprimir = 0;
+            PREqntdPLExcluir = 0;
+            PREqntdPLNesting12mm = 0;
+            PREqntdPLNesting15mm = 0;
+            PREqntdPLNesting18mm = 0;
+            PREqntdPLNesting25mm = 0;
+
+            lblAgMDF.Text = "Aguardando...";
+            lblAgPerfil.Text = "Aguardando...";
+
+            chckbxPinFolha.Text = "A - Pint Folha: " + PREqntdPLPinFolha;
+            chckbxRipa.Text = "B - Ripa: " + PREqntdPLRipa;
+            chckbx18MM.Text = "C - 18MM : " + PREqntdPL18mm;
+            chckbx25MM.Text = "D - 25MM: " + PREqntdPL25mm;
+            chckbxOutros.Text = "E - Outros: " + PREqntdPLOutros;
+            chckbxImprimir.Text = "F - Imprimir: " + PREqntdPLImprimir;
+            chckbxExcluir.Text = "G - Excluir: " + PREqntdPLExcluir;
+            chckbxNest12MM.Text = "NEST 12MM: " + PREqntdPLNesting12mm;
+            chckbxNest18MM.Text = "NEST 18MM: " + PREqntdPLNesting18mm;
+            chckbxNest25MM.Text = "NEST 25MM: " + PREqntdPLNesting25mm;
+
         }
     }
 
