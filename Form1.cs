@@ -44,7 +44,7 @@ namespace Classificador_de_Peças
 
         public string codigoUltimaLeitura = "";
         public int qntdpecasgrid;
-        public string versao = "[2.11]";
+        public string versao = "[2.12]";
 
         public string caminhoPadraoInfoPecas = @"J:\PCP\InfoPecasPlanos\";
         //public string caminhoPadraoInfoPecas = @"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\";
