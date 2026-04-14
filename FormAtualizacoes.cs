@@ -108,6 +108,7 @@ namespace Classificador_de_Peças
                         " * Ajustado: Regra no Base Calceiro, Chamfer, Half, Italian, Ocult, Sotille e Curved que não contém MP faz a inserção no Posto Operativo.\n" +
                         " * Melhoria do código: Diminuição de código para melhor performance.\n" +
                         " * Ajustado: Tubo estriado entrando no Relatório de MP quando é outro MDF puxando o mesmo módulo, inserção da regra para que o MDF contenha 'DISPENSER'.\n" +
+                        " * Ajustado: Matéria-prima de porta removida do Relatório de MP.\n" +
                         " * Ajustado: Caso tente carregar csv de MDF em perfil ou vice-versa, ou caso não seja um formato válido de csv, o programa reseta e limpa tudo.\n" 
 
 
