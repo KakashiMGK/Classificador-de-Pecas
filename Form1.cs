@@ -44,7 +44,7 @@ namespace Classificador_de_Peças
 
         public string codigoUltimaLeitura = "";
         public int qntdpecasgrid;
-        public string versao = "[2.12]";
+        public string versao = "[2.13]";
 
         public string caminhoPadraoInfoPecas = @"J:\PCP\InfoPecasPlanos\";
         //public string caminhoPadraoInfoPecas = @"C:\Users\sergi\Desktop\PCP\InfoPecasPlanos\";
@@ -856,7 +856,7 @@ namespace Classificador_de_Peças
             // Caso o usuário selecione um arquivo de perfil ou decide continuar mesmo sem o arquivo selecionado, o processo continua normalmente 
             label2.Text = "Status: Processo de classificação iniciado.";
 
-            progressBar1.Maximum = qntdpecasgrid * 3 + 14;
+            progressBar1.Maximum = 3;
             valorProgresso = 0;
 
             // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
@@ -1231,6 +1231,7 @@ namespace Classificador_de_Peças
 
                 var pecasCodigoBarrasErradoList = new List<Armazenado> { }; // Lista das Peças com Códigos Errados
 
+                var listaBruto = new List<Armazenado> { }; // Cria a listagem bruto para analisar os parceiros do Snow Matt
                 var listaCalculoM2 = new List<Armazenado> { }; // Lista para receber todos os materiais para calculo do m2 geral de cada acabamento
 
                 // AS LISTAS PARA EXPLOSÃO DO CSV PARA RELATORIO DO LOTE
@@ -1369,6 +1370,12 @@ namespace Classificador_de_Peças
 
                 var lote = loteCru; // captura a variável local
 
+                var cont = 0;
+                foreach (var linha in loteCru) // Adiciona o conteudo do loteCru em ListaBruto
+                {
+                    Armazenado arm = linha;
+                    listaBruto.Add(arm);
+                }
 
                 foreach (var linha in loteCru)
                 {
@@ -1399,7 +1406,7 @@ namespace Classificador_de_Peças
                         armazenar.DescricaoPeca = armazenar.DescricaoPeca.Replace("X12X12X", "X18X18X");
                         armazenar.DesenhoUm = "Removido Usi"; // remove a usinagem por via das duvidas
                         armazenar.DescricaoMaterial = armazenar.DescricaoMaterial + "ALT 12MM PARA 18MM"; // adiciona na descrição do material a alteração feita para controle
-                        foreach (var item in listaCalculoM2) // percorre pela lista calculada m2
+                        foreach (var item in listaBruto) // percorre pela listagem bruta
                         {
                             Armazenado arm2 = item;
                             if (arm2.Modulo == armazenar.Modulo && armazenar.DescricaoPeca.Length >= 3 && arm2.DescricaoPeca.Substring(0, 3) == "MPR" && arm2.CodigoPeca.Contains("POPA"))
@@ -1462,6 +1469,7 @@ namespace Classificador_de_Peças
                         }
                     }
 
+                    
 
                     // PARA NAO CONTAR MAO AMIGA MENOR QUE 451
                     if (armazenar.DescricaoPeca.Substring(0, 9) == "MAO AMIGA" && altura < 451)
@@ -1516,7 +1524,7 @@ namespace Classificador_de_Peças
 
                     }
 
-
+                    
                     qntdPecasLote++;
                     numeroLote = armazenar.NumeroLote;
 
@@ -1537,7 +1545,7 @@ namespace Classificador_de_Peças
                     else if (armazenar.NumeroLote.Length <= 3 && !string.IsNullOrEmpty(numeroLote))
                         numeroLote = new string(armazenar.NumeroLote.Where(char.IsDigit).ToArray()).Substring(0, 3);
 
-
+                    
                     // Se não sobrar nada, vira "0"
                     if (string.IsNullOrEmpty(numeroLote))
                     {
@@ -1545,11 +1553,9 @@ namespace Classificador_de_Peças
                     }
 
 
-                    armazenar.AlturaCorte = ((altura / 1000) * (largura / 1000)).ToString(); // Adiciona na coluna Imagem Material o M2 da peça 
+                    armazenar.AlturaCorte = ((altura / 1000m) * (largura / 1000m)).ToString(); // Adiciona na coluna Imagem Material o M2 da peça 
                     listaCalculoM2.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
-
+                    
                     if (armazenar.DescricaoPeca.Contains(" L ") || armazenar.DescricaoPeca.Contains(".L "))
                     {
                         if (!armazenar.DescricaoPeca.Contains("PRAT") && !armazenar.DescricaoPeca.Contains("PORTA"))
@@ -1561,6 +1567,7 @@ namespace Classificador_de_Peças
                             qntdFiletacaoLote++;
                     }
                 }
+
                 // Descrição do que está fazendo atualmente no Painel de Visualização Secundário
                 PainelSecundario.AppendText("\n\nAnalisando a quantidade de peças por operação.");
                 PainelSecundario.ScrollToCaret();
@@ -1611,13 +1618,13 @@ namespace Classificador_de_Peças
                 PainelSecundario.AppendText("\n\nAnalise de quantidades e alterações feitas.");
                 PainelSecundario.ScrollToCaret();
 
-                var cont = 0;
 
                 foreach (var linha in listaCalculoM2)
                 {
 
                     Armazenado armazenar = linha;
 
+                    
 
                     //Console.WriteLine(armazenar.CodigoBarras);
                     // CONSERTA AS ESPESSURAS NA COLUNA DE ACORDO COM O CODIGO DO MATERIAL
@@ -2466,9 +2473,6 @@ namespace Classificador_de_Peças
                     brutoGeralList.Add(armazenar.ERP + ";" + armazenar.RazaoSocial + ";" + armazenar.PedidoAmbiente + ";" + armazenar.Planejador + ";" + armazenar.Quantidade + ";" + armazenar.Altura + ";" + armazenar.Largura + ";" + armazenar.Espessura + ";" + armazenar.CodigoMaterial + ";" + armazenar.DescricaoMaterial + ";" + armazenar.LarguraCorte + ";" + armazenar.AlturaCorte + ";" + armazenar.ImagemMaterial + ";" + armazenar.CodigoPeca + ";" + armazenar.Complemento + ";" + armazenar.DescricaoPeca + ";" + armazenar.DesenhoUm + ";" + armazenar.DesenhoDois + ";" + armazenar.DesenhoTres + ";" + armazenar.VeioMaterial + ";" + armazenar.BordaSup + ";" + armazenar.BordaInf + ";" + armazenar.BordaEsq + ";" + armazenar.BordaDir + ";" + armazenar.DestinoImpressao + ";" + armazenar.CodigoBarras + ";" + armazenar.PostosOperativos + ";" + armazenar.NumeroLote + ";" + armazenar.CodigoCliente + ";" + armazenar.Modulo + ";" + armazenar.NumeroOrdem + ";" + armazenar.DataEntrega + ";" + armazenar.Plano + ";" + armazenar.Especial);
                     qntdBrutoGeral++;
 
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
-
                     // Adiciona os itens que serão mantidas as ordens no MES em lista 
                     if (armazenar.Complemento == "G_EXCLUIR" || armazenar.Complemento == "F_IMPRIMIR")
                         pecasInativar.Add(int.Parse(armazenar.NumeroOrdem));
@@ -2486,6 +2490,9 @@ namespace Classificador_de_Peças
                     }
 
                 }
+
+                valorProgresso++; 
+                progressBar1.Value = valorProgresso; // Adiciona a 1 etapa na barra de progresso
 
                 PainelSecundario.AppendText($"\n\n{contagemList.Count()} peça(s) classificada(s).");
                 PainelSecundario.ScrollToCaret();
@@ -2516,8 +2523,6 @@ namespace Classificador_de_Peças
 
                             }
 
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
 
                 }
 
@@ -2616,8 +2621,6 @@ namespace Classificador_de_Peças
                         }
                     }
                 }
-                valorProgresso++;
-                progressBar1.Value = valorProgresso;
                 if (qntdpecasCodigoBarrasErrado > 0)
                 {
                     pecasCodigoBarrasErradoList.ForEach(pecas =>
@@ -2644,8 +2647,6 @@ namespace Classificador_de_Peças
                     }
                 }
 
-                valorProgresso++;
-                progressBar1.Value = valorProgresso;
                 string caminhoFinal = caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\"))
                       + @"\Relatorios de peças\BRUTO.xlsx";
 
@@ -2671,8 +2672,6 @@ namespace Classificador_de_Peças
 
                     }
 
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
                     tabelaRelacaoPecas.Rows.Clear();
                     // CRIAÇÃO DOS XLSX DA RELACAO DE PECAS MP
                     MAList.ForEach(pecas =>
@@ -2689,8 +2688,6 @@ namespace Classificador_de_Peças
 
 
                     }
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
 
@@ -2708,8 +2705,6 @@ namespace Classificador_de_Peças
                         }
 
                     }
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
 
@@ -2729,8 +2724,7 @@ namespace Classificador_de_Peças
                     }
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
+
                     // CRIAÇÃO DOS XLSX DA RELACAO DE PECAS MP
                     FOLHAList.ForEach(pecas =>
                     {
@@ -2745,8 +2739,7 @@ namespace Classificador_de_Peças
                         }
 
                     }
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
+
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
 
@@ -2764,8 +2757,6 @@ namespace Classificador_de_Peças
                         }
 
                     }
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
 
@@ -2816,8 +2807,7 @@ namespace Classificador_de_Peças
                         }
 
                     }
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
+
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
 
@@ -2841,8 +2831,6 @@ namespace Classificador_de_Peças
 
                     // LIMPA A TABELA PARA REUTILZAR
                     tabelaRelacaoPecas.Rows.Clear();
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
 
                 }
 
@@ -3103,8 +3091,6 @@ namespace Classificador_de_Peças
                     PainelSecundario.ScrollToCaret();
                     //var ultimom2 = "";
 
-                    valorProgresso++;
-                    progressBar1.Value = valorProgresso;
                 }
                 else // SE ESTÁ SELECIONADO O Unico CSV / Ripa / Imprimir / Excluir
                 {
@@ -3349,6 +3335,8 @@ namespace Classificador_de_Peças
                     }
 
                 }
+                valorProgresso++; 
+                progressBar1.Value = valorProgresso; // Adiciona a 2 etapa na barra de progresso
 
 
                 PainelSecundario.AppendText("\n\nQuantidade peças para Inativar operação CO: " + pecasInativar.Count());
@@ -3448,7 +3436,6 @@ namespace Classificador_de_Peças
 
                 if (chckBoxEnvioEmail.Checked == true)
                     EnvioEmail();
-                valorProgresso++;
 
                 var progress = new Progress<ProgressoCopia>(p =>
                 {
@@ -3502,7 +3489,8 @@ namespace Classificador_de_Peças
                 // Log
                 var textoLog = PainelSecundario.Text;
                 File.AppendAllText(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\Classificador_Log.txt", textoLog + Environment.NewLine);
-
+                valorProgresso++;
+                progressBar1.Value = valorProgresso; // Adiciona a 3 etapa na barra de progresso FIM
 
             }
 
@@ -3510,6 +3498,9 @@ namespace Classificador_de_Peças
             {
                 MessageBox.Show($"{ex.Message}");
                 PararProgresso();
+                // Log
+                var textoLog = PainelSecundario.Text;
+                File.AppendAllText(caminhocolado2.Substring(0, caminhocolado2.LastIndexOf(@"\")) + @"\Classificador_Log.txt", textoLog + Environment.NewLine);
             }
 
 
@@ -3680,7 +3671,6 @@ namespace Classificador_de_Peças
                 if (!listaNovaMP.Any(p => p.NumeroOrdem == armMP.NumeroOrdem))
                     listaNovaMP.Add(armMP);
 
-
                 if ((armMP.DescricaoPeca.Contains("SOTILLE") || armMP.DescricaoPeca.Contains("SAPATEIRA") )&& !listSotilles.Contains(armMP.Modulo + armMP.ERP)) // Caso seja porta sotille ou sapateira e já nao foi feita a contagem
                 {
                     listSotilles.Add(armMP.Modulo + armMP.ERP); // adiciona na lista de sotille o modulo + erp para nao refazer a contagem
@@ -3721,7 +3711,8 @@ namespace Classificador_de_Peças
                         if (armPerfil.Modulo == armMP.Modulo &&
                             armPerfil.ERP == armMP.ERP &&
                             codigosMPList.Contains(armPerfil.CodigoMaterial))
-                        {                           
+                        {              
+                            
                             // Adiciona Cantoneira se atender à regra
                             if (armPerfil.DescricaoPeca.Contains("CANTONEIRA") &&
                                 !armPerfil.DescricaoPeca.Contains("95,7") &&
@@ -3765,8 +3756,9 @@ namespace Classificador_de_Peças
                             {
                                 listaNovaMP.Add(armPerfil);
                             }
+                            
                         }
-
+                        
                         // Painel Canaletado e Perfis canaletados
                         if (armMP.DescricaoPeca.Contains("CANALETADO") && contemPecaMdf == false)
                         {
@@ -4242,9 +4234,7 @@ namespace Classificador_de_Peças
                 else if (!itensSemInfoList.Contains(arm.CodigoPeca.Substring(0, arm.CodigoPeca.IndexOf(".")) + "." + arm.Espessura))
                     itensSemInfoList.Add(arm.CodigoPeca.Substring(0, arm.CodigoPeca.IndexOf(".")) + "." + arm.Espessura);
             }
-            if (primeiroValorProgresso == 0)
-                progressBar1.Maximum = int.Parse(itensSemInfoList.Count().ToString());
-            primeiroValorProgresso = int.Parse(itensSemInfoList.Count().ToString());
+            
 
             // Se houver algum item sem informação ele irá gerar a pesquisa e informará
             if (itensSemInfoList.Count() > 0)
@@ -4301,9 +4291,6 @@ namespace Classificador_de_Peças
 
 
                             codigoUltimaLeitura = armazenar.CodigoPeca.Substring(0, armazenar.CodigoPeca.IndexOf(".")) + "." + armazenar.Espessura;
-
-                            valorProgresso++;
-                            progressBar1.Value = valorProgresso;
 
                         }
 

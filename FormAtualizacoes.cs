@@ -111,8 +111,17 @@ namespace Classificador_de_Peças
                         " * Ajustado: Matéria-prima de porta removida do Relatório de MP.\n" +
                         " * Ajustado: Caso tente carregar csv de MDF em perfil ou vice-versa, ou caso não seja um formato válido de csv, o programa reseta e limpa tudo.\n" 
 
-
-
+                    }
+                },
+                new Atualizacao
+                {
+                    Versao = "2.13",
+                    Data = DateTime.Parse("2026-04-17"),
+                    Mudancas = new List<string>
+                    {
+                        " * Ajuste ERRO: Barra de progresso ajuste de contagem de progresso. (Estava quebrando o código) \n" +
+                        " * Ajustado: Peças parceiras do Snow matt não estavam sendo encontradas e não estavam sendo alteradas.\n"
+                        
                     }
                 }
                 //new Atualizacao // Versão 
